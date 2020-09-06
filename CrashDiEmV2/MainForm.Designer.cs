@@ -42,6 +42,7 @@
             this.textBox_CrashLogs = new System.Windows.Forms.TextBox();
             this.btn_Select_crash_logs = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.progressBar1 = new CrashDiEmV2.TextProgressBar();
             this.checkBox_GroupIssueByGoogle = new System.Windows.Forms.CheckBox();
             this.checkBox_RemoveSOPath = new System.Windows.Forms.CheckBox();
             this.checkBox_parseDsym = new System.Windows.Forms.CheckBox();
@@ -72,7 +73,7 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.numericUpDown_MaxLineOfStackToShow = new System.Windows.Forms.NumericUpDown();
             this.label_NumLineStack = new System.Windows.Forms.Label();
-            this.progressBar1 = new CrashDiEmV2.TextProgressBar();
+            this.checkBox_showAddress = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -109,19 +110,19 @@
             // 
             this.textBox_arm.Location = new System.Drawing.Point(87, 22);
             this.textBox_arm.Name = "textBox_arm";
-            this.textBox_arm.Size = new System.Drawing.Size(250, 20);
+            this.textBox_arm.Size = new System.Drawing.Size(260, 20);
             this.textBox_arm.TabIndex = 2;
             // 
             // textBox_x86
             // 
             this.textBox_x86.Location = new System.Drawing.Point(87, 49);
             this.textBox_x86.Name = "textBox_x86";
-            this.textBox_x86.Size = new System.Drawing.Size(250, 20);
+            this.textBox_x86.Size = new System.Drawing.Size(260, 20);
             this.textBox_x86.TabIndex = 3;
             // 
             // btn_arm64_v8a
             // 
-            this.btn_arm64_v8a.Location = new System.Drawing.Point(364, 21);
+            this.btn_arm64_v8a.Location = new System.Drawing.Point(374, 21);
             this.btn_arm64_v8a.Name = "btn_arm64_v8a";
             this.btn_arm64_v8a.Size = new System.Drawing.Size(75, 22);
             this.btn_arm64_v8a.TabIndex = 4;
@@ -131,7 +132,7 @@
             // 
             // btn_x86_64
             // 
-            this.btn_x86_64.Location = new System.Drawing.Point(364, 48);
+            this.btn_x86_64.Location = new System.Drawing.Point(374, 48);
             this.btn_x86_64.Name = "btn_x86_64";
             this.btn_x86_64.Size = new System.Drawing.Size(75, 22);
             this.btn_x86_64.TabIndex = 5;
@@ -158,16 +159,16 @@
             // 
             // textBox_x86_64
             // 
-            this.textBox_x86_64.Location = new System.Drawing.Point(445, 49);
+            this.textBox_x86_64.Location = new System.Drawing.Point(455, 49);
             this.textBox_x86_64.Name = "textBox_x86_64";
-            this.textBox_x86_64.Size = new System.Drawing.Size(250, 20);
+            this.textBox_x86_64.Size = new System.Drawing.Size(260, 20);
             this.textBox_x86_64.TabIndex = 7;
             // 
             // textBox_armV8
             // 
-            this.textBox_armV8.Location = new System.Drawing.Point(445, 22);
+            this.textBox_armV8.Location = new System.Drawing.Point(455, 22);
             this.textBox_armV8.Name = "textBox_armV8";
-            this.textBox_armV8.Size = new System.Drawing.Size(250, 20);
+            this.textBox_armV8.Size = new System.Drawing.Size(260, 20);
             this.textBox_armV8.TabIndex = 6;
             // 
             // groupBox2
@@ -227,6 +228,19 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Analyse";
             // 
+            // progressBar1
+            // 
+            this.progressBar1.CustomText = "";
+            this.progressBar1.Location = new System.Drawing.Point(486, 19);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
+            this.progressBar1.Size = new System.Drawing.Size(234, 23);
+            this.progressBar1.TabIndex = 5;
+            this.progressBar1.TextColor = System.Drawing.Color.Black;
+            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
+            this.progressBar1.VisualMode = CrashDiEmV2.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
+            // 
             // checkBox_GroupIssueByGoogle
             // 
             this.checkBox_GroupIssueByGoogle.AutoSize = true;
@@ -263,6 +277,7 @@
             // 
             // btn_Analyse
             // 
+            this.btn_Analyse.ForeColor = System.Drawing.Color.Black;
             this.btn_Analyse.Location = new System.Drawing.Point(7, 20);
             this.btn_Analyse.Name = "btn_Analyse";
             this.btn_Analyse.Size = new System.Drawing.Size(75, 23);
@@ -466,15 +481,15 @@
             // 
             // textBox_Highlight
             // 
-            this.textBox_Highlight.Location = new System.Drawing.Point(418, 164);
+            this.textBox_Highlight.Location = new System.Drawing.Point(439, 164);
             this.textBox_Highlight.Name = "textBox_Highlight";
-            this.textBox_Highlight.Size = new System.Drawing.Size(326, 20);
+            this.textBox_Highlight.Size = new System.Drawing.Size(305, 20);
             this.textBox_Highlight.TabIndex = 11;
             // 
             // label_Highlight
             // 
             this.label_Highlight.AutoSize = true;
-            this.label_Highlight.Location = new System.Drawing.Point(369, 170);
+            this.label_Highlight.Location = new System.Drawing.Point(390, 167);
             this.label_Highlight.Name = "label_Highlight";
             this.label_Highlight.Size = new System.Drawing.Size(48, 13);
             this.label_Highlight.TabIndex = 12;
@@ -504,7 +519,7 @@
             0,
             0,
             0});
-            this.numericUpDown_MaxLineOfStackToShow.Location = new System.Drawing.Point(850, 163);
+            this.numericUpDown_MaxLineOfStackToShow.Location = new System.Drawing.Point(849, 163);
             this.numericUpDown_MaxLineOfStackToShow.Name = "numericUpDown_MaxLineOfStackToShow";
             this.numericUpDown_MaxLineOfStackToShow.Size = new System.Drawing.Size(46, 20);
             this.numericUpDown_MaxLineOfStackToShow.TabIndex = 14;
@@ -512,30 +527,29 @@
             // label_NumLineStack
             // 
             this.label_NumLineStack.AutoSize = true;
-            this.label_NumLineStack.Location = new System.Drawing.Point(756, 170);
+            this.label_NumLineStack.Location = new System.Drawing.Point(758, 166);
             this.label_NumLineStack.Name = "label_NumLineStack";
             this.label_NumLineStack.Size = new System.Drawing.Size(91, 13);
             this.label_NumLineStack.TabIndex = 15;
             this.label_NumLineStack.Text = "Num line to show:";
             // 
-            // progressBar1
+            // checkBox_showAddress
             // 
-            this.progressBar1.CustomText = "";
-            this.progressBar1.Location = new System.Drawing.Point(486, 19);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
-            this.progressBar1.Size = new System.Drawing.Size(234, 23);
-            this.progressBar1.TabIndex = 5;
-            this.progressBar1.TextColor = System.Drawing.Color.Black;
-            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
-            this.progressBar1.VisualMode = CrashDiEmV2.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
-            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
+            this.checkBox_showAddress.AutoSize = true;
+            this.checkBox_showAddress.Location = new System.Drawing.Point(910, 166);
+            this.checkBox_showAddress.Name = "checkBox_showAddress";
+            this.checkBox_showAddress.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.checkBox_showAddress.Size = new System.Drawing.Size(124, 17);
+            this.checkBox_showAddress.TabIndex = 16;
+            this.checkBox_showAddress.Text = "Show Crash Address";
+            this.checkBox_showAddress.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1344, 736);
+            this.Controls.Add(this.checkBox_showAddress);
             this.Controls.Add(this.label_NumLineStack);
             this.Controls.Add(this.numericUpDown_MaxLineOfStackToShow);
             this.Controls.Add(this.textBox_Resultt);
@@ -603,7 +617,7 @@
         private System.Windows.Forms.ListView listView3;
         private System.Windows.Forms.ListView listView4;
         private System.Windows.Forms.CheckBox checkBox_txt;
-        private TextProgressBar progressBar1;
+        private CrashDiEmV2.TextProgressBar progressBar1;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.ColumnHeader columnHeader_Manufacture;
         private System.Windows.Forms.ColumnHeader columnHeader_Name;
@@ -614,6 +628,7 @@
         private System.Windows.Forms.NumericUpDown numericUpDown_MaxLineOfStackToShow;
         private System.Windows.Forms.Label label_NumLineStack;
         private System.Windows.Forms.ColumnHeader column_Issue;
+        private System.Windows.Forms.CheckBox checkBox_showAddress;
     }
 }
 

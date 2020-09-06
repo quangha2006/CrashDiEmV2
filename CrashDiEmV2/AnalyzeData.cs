@@ -102,14 +102,38 @@ namespace CrashDiEmV2
         private int m_numFiles = 0;
         public List<Device> m_DevicesList = new List<Device>(); 
 
-        public void SetLogCrashPath(string dataPath)
+        public string LogCrashPath
         {
-            m_DataPath = dataPath;
+            set
+            {
+                m_DataPath = value;
+            }
+            get
+            {
+                return m_DataPath;
+            }
         }
-        public int GetNumFile()
+        public int ReportCount
         {
-            m_numFiles = Directory.GetFiles(m_DataPath, "*.txt", SearchOption.AllDirectories).Length;
-            return m_numFiles;
+            get
+            {
+                m_numFiles = Directory.GetFiles(m_DataPath, "*.txt", SearchOption.AllDirectories).Length;
+                return m_numFiles;
+            }
+        }
+        public ref List<AnalyzeData.Issue> IssuesList
+        {
+            get
+            {
+                return ref m_issueList;
+            }
+        }
+        public ref List<AnalyzeData.Device> DevicesList
+        {
+            get
+            {
+                return ref m_DevicesList;
+            }
         }
         public int LoadCrashLogs(BackgroundWorker backgroundWorker, MySetting setting)
         {
@@ -362,14 +386,7 @@ namespace CrashDiEmV2
                 }
             }
         }
-        public ref List<AnalyzeData.Issue> GetIssueList()
-        {
-            return ref m_issueList;
-        }
-        public ref List<AnalyzeData.Device> GetDevicesList()
-        {
-            return ref m_DevicesList;
-        }
+
         public string[] GetBacktraceByID(int ID)
         {
             //Can opt by return index m_issueData[ID].Stactrace

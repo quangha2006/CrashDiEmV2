@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,7 @@ namespace CrashDiEmV2
     public partial class MainForm : Form
     {
         private AnalyzeData m_analyzeData = new AnalyzeData();
-        private AppSettings appSettings = new AppSettings();
+        private AppSettings m_appSettings = new AppSettings();
         public delegate void SetUpProgressBarDelegate(int minimum, int maximum, bool enable = true, string customText = null);
         private string m_dataToShow;
         public MainForm()
@@ -30,25 +31,24 @@ namespace CrashDiEmV2
             backgroundWorker1.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
             numericUpDown_MaxLineOfStackToShow.Value = 20;
             //Load Setting
-            if (appSettings.LoadSettings())
+            if (m_appSettings.LoadSettings())
             {
-                textBox_arm.Text = appSettings.ArmSoPath;
-                textBox_armV8.Text = appSettings.Arm64SoPath;
-                textBox_x86.Text = appSettings.X86SoPath;
-                textBox_x86_64.Text = appSettings.X86_64SoPath;
-                textBox_CrashLogs.Text = appSettings.CrashLogPath;
-                btn_Analyse.Enabled = true;
+                textBox_arm.Text = m_appSettings.ArmSoPath;
+                textBox_armV8.Text = m_appSettings.Arm64SoPath;
+                textBox_x86.Text = m_appSettings.X86SoPath;
+                textBox_x86_64.Text = m_appSettings.X86_64SoPath;
+                textBox_CrashLogs.Text = m_appSettings.CrashLogPath;
             }
         }
         private void SaveSettings()
         {
-            appSettings.ArmSoPath = textBox_arm.Text;
-            appSettings.Arm64SoPath = textBox_armV8.Text;
-            appSettings.X86SoPath = textBox_x86.Text;
-            appSettings.X86_64SoPath  = textBox_x86_64.Text;
-            appSettings.CrashLogPath = textBox_CrashLogs.Text;
+            m_appSettings.ArmSoPath = textBox_arm.Text;
+            m_appSettings.Arm64SoPath = textBox_armV8.Text;
+            m_appSettings.X86SoPath = textBox_x86.Text;
+            m_appSettings.X86_64SoPath  = textBox_x86_64.Text;
+            m_appSettings.CrashLogPath = textBox_CrashLogs.Text;
 
-            appSettings.SaveToFile();
+            m_appSettings.SaveToFile();
         }
         private void label1_Click(object sender, EventArgs e)
         {
@@ -161,7 +161,6 @@ namespace CrashDiEmV2
             {
                 string folderPath = fbd.SelectedPath;
                 textBox_CrashLogs.Text = folderPath;
-                btn_Analyse.Enabled = true;
                 SaveSettings();
             }
         }
@@ -182,8 +181,8 @@ namespace CrashDiEmV2
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
-            m_analyzeData.SetLogCrashPath(textBox_CrashLogs.Text);
-            int fCount = m_analyzeData.GetNumFile();
+            m_analyzeData.LogCrashPath = textBox_CrashLogs.Text;
+            int fCount = m_analyzeData.ReportCount;
             if (fCount > 0)
             {
                 this.Invoke((MethodInvoker)delegate
@@ -244,10 +243,10 @@ namespace CrashDiEmV2
         }
         private void textBox_CrashLogs_TextChanged(object sender, EventArgs e)
         {
-            if (textBox_CrashLogs.TextLength == 0)
-                btn_Analyse.Enabled = false;
-            else
+            if (textBox_CrashLogs.Text.Length > 0 && Directory.Exists(textBox_CrashLogs.Text))
                 btn_Analyse.Enabled = true;
+            else
+                btn_Analyse.Enabled = false;
         }
 
         private void progressBar1_Click(object sender, EventArgs e)
@@ -259,10 +258,12 @@ namespace CrashDiEmV2
             if (isCanAnalyse)
             {
                 btn_Analyse.Text = "Analyse";
+                btn_Analyse.ForeColor = Color.Black;
             }
             else
             {
                 btn_Analyse.Text = "Stop!";
+                btn_Analyse.ForeColor = Color.Red;
             }
         }
 
@@ -278,7 +279,7 @@ namespace CrashDiEmV2
         }
         private void PostData_DeviceList(int index)
         {
-            var devicesList = m_analyzeData.GetDevicesList();
+            var devicesList = m_analyzeData.DevicesList;
 
             List<int> dataList = devicesList[index].CrashLogIndex;
             //string m_dataToShow;
@@ -335,7 +336,7 @@ namespace CrashDiEmV2
         }
         private void ShowData_Device()
         {
-            var devicesList = m_analyzeData.GetDevicesList();
+            var devicesList = m_analyzeData.DevicesList;
             foreach (var device in devicesList)
             {
                 var item = new ListViewItem(new string[] { device.DeviceBrand, device.DeviceName, device.DeviceModel, device.CrashLogIndex.Count().ToString() });
@@ -344,7 +345,7 @@ namespace CrashDiEmV2
         }
         private void ShowData_Issue_ByAddress()
         {
-            var issueList = m_analyzeData.GetIssueList();
+            var issueList = m_analyzeData.IssuesList;
             int index = 0;
             foreach (var issue in issueList)
             {
@@ -355,7 +356,7 @@ namespace CrashDiEmV2
         }
         private void ShowData_Issue_ByGoogle()
         {
-            var issueList = m_analyzeData.GetIssueList();
+            var issueList = m_analyzeData.IssuesList;
             int index = 0;
             List<string> issueAdded = new List<string>();
             foreach (var issue in issueList)
@@ -383,7 +384,7 @@ namespace CrashDiEmV2
         }
         private void PostData_IssueList(string issueName)
         {
-            var issueList = m_analyzeData.GetIssueList();
+            var issueList = m_analyzeData.IssuesList;
             m_dataToShow = "";
             foreach(var issue in issueList)
             {
