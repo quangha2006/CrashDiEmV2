@@ -100,7 +100,7 @@ namespace CrashDiEmV2
         private CrashData[] m_CrashDataRaw;
         private List<Issue> m_issueList = new List<Issue>();
         private int m_numFiles = 0;
-        public List<Device> m_DevicesList = new List<Device>(); 
+        private List<Device> m_DevicesList = new List<Device>(); 
 
         public string LogCrashPath
         {
@@ -152,11 +152,13 @@ namespace CrashDiEmV2
                 foreach (string file in List_files)
                 {
                     string contents = File.ReadAllText(file);
-                    
-                    m_CrashDataRaw[index] = ConvertData(ref contents, file, setting);
-
-                    index++;
-                    backgroundWorker.ReportProgress(index);
+                    string[] lines = contents.Split('\n');
+                    if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
+                    {
+                        m_CrashDataRaw[index] = ConvertData(ref lines, file, setting);
+                        index++;
+                        backgroundWorker.ReportProgress(index);
+                    }
                     if (backgroundWorker.CancellationPending)
                     {
                         //Need clear data here!
@@ -171,9 +173,9 @@ namespace CrashDiEmV2
             Console.WriteLine("Time to load " + index + " files: " + totalTime);
             return index;
         }
-        private CrashData ConvertData(ref string contents, string path, MySetting setting)
+        private CrashData ConvertData(ref string[] lines, string path, MySetting setting)
         {
-            string[] lines = contents.Split('\n');
+           // string[] lines = contents.Split('\n');
             string type = lines[0];
             //if (type != "NATIVE CRASH" || type != "JAVA CRASH")
                 //return null;

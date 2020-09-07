@@ -56,7 +56,7 @@
     </Win32Resource>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>maxresdefault_itj_4.ico</ApplicationIcon>
+    <ApplicationIcon>application_form_512_d8Y_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -127,6 +127,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="application_form_512_d8Y_icon.ico" />
     <Content Include="maxresdefault_HPp_9.ico" />
     <Content Include="maxresdefault_itj_4.ico" />
   </ItemGroup>

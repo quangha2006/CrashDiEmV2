@@ -81,6 +81,7 @@ namespace CrashDiEmV2
                 textBox_arm.Text = fileName;
                 SaveSettings();
             }
+            dlg = null;
         }
 
         private void btn_x86_Click(object sender, EventArgs e)
@@ -99,6 +100,7 @@ namespace CrashDiEmV2
                 textBox_x86.Text = fileName;
                 SaveSettings();
             }
+            dlg = null;
         }
 
         private void btn_arm64_v8a_Click(object sender, EventArgs e)
@@ -117,6 +119,7 @@ namespace CrashDiEmV2
                 textBox_armV8.Text = fileName;
                 SaveSettings();
             }
+            dlg = null;
         }
 
         private void btn_x86_64_Click(object sender, EventArgs e)
@@ -135,6 +138,7 @@ namespace CrashDiEmV2
                 textBox_x86_64.Text = fileName;
                 SaveSettings();
             }
+            dlg = null;
         }
 
         private void btn_Select_crash_logs_Click(object sender, EventArgs e)
@@ -163,6 +167,7 @@ namespace CrashDiEmV2
                 textBox_CrashLogs.Text = folderPath;
                 SaveSettings();
             }
+            fbd = null;
         }
 
         private void btn_Analyse_Click(object sender, EventArgs e)
