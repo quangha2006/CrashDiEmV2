@@ -33,14 +33,7 @@ namespace CrashDiEmV2
             Native_Crash,
             JAVA_Crash
         }
-        public struct Issue
-        {
-            public string Name;
-            public int ID;
-            public string AddressList;
-            public string FolderName;
-            public string[] Stactrace;
-        }
+
         public struct CrashData
         {
             public string Path;
@@ -98,7 +91,7 @@ namespace CrashDiEmV2
 
         private string m_DataPath;
         private CrashData[] m_CrashDataRaw;
-        private List<Issue> m_issueList = new List<Issue>();
+        private List<CrashReport> m_issueList;
         private int m_numFiles = 0;
         private List<Device> m_DevicesList = new List<Device>(); 
 
@@ -121,7 +114,7 @@ namespace CrashDiEmV2
                 return m_numFiles;
             }
         }
-        public ref List<AnalyzeData.Issue> IssuesList
+        public ref List<CrashReport> IssuesList
         {
             get
             {
@@ -135,12 +128,23 @@ namespace CrashDiEmV2
                 return ref m_DevicesList;
             }
         }
+        private void ClearAndReInitData()
+        {
+            //Clear Old Data
+            m_CrashDataRaw = null;
+            m_CrashDataRaw = new CrashData[m_numFiles];
+            m_issueList = null;
+            m_issueList = new List<CrashReport>();
+            m_DevicesList = null;
+            m_DevicesList = new List<Device>();
+        }
         public int LoadCrashLogs(BackgroundWorker backgroundWorker, MySetting setting)
         {
             if (m_numFiles < 0)
                 return 0;
-            
-            m_CrashDataRaw = new CrashData[m_numFiles];
+
+            ClearAndReInitData();
+
             int index = 0;
             string[] List_files;
             long totalTime = 0;
@@ -155,7 +159,7 @@ namespace CrashDiEmV2
                     string[] lines = contents.Split('\n');
                     if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
                     {
-                        m_CrashDataRaw[index] = ConvertData(ref lines, file, setting);
+                        ConvertData(ref lines, file, setting, index);
                         index++;
                         backgroundWorker.ReportProgress(index);
                     }
@@ -173,12 +177,9 @@ namespace CrashDiEmV2
             Console.WriteLine("Time to load " + index + " files: " + totalTime);
             return index;
         }
-        private CrashData ConvertData(ref string[] lines, string path, MySetting setting)
+        private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
         {
-           // string[] lines = contents.Split('\n');
             string type = lines[0];
-            //if (type != "NATIVE CRASH" || type != "JAVA CRASH")
-                //return null;
             string appcode = lines[2].Substring(lines[2].IndexOf(':') + 2);
             string Datetime = lines[3];
             string Versioncode = lines[4];
@@ -192,8 +193,6 @@ namespace CrashDiEmV2
             CrashData data = new CrashData(path);
 
             data.CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash;
-
-            // data.AppCode = appcode.ToCharArray(); // using array char
 
             data.AppCode = appcode;
 
@@ -291,23 +290,27 @@ namespace CrashDiEmV2
                     addressString += splitLine[5];
                 }
                 bool isNewIssue = true;
-                foreach (Issue issue in m_issueList)
+                for(int i = 0; i < m_issueList.Count(); i++)
                 {
-                    if (issue.AddressList == addressString)
+                    if (m_issueList[i].AddressList == addressString)
                     {
-                        data.IssueID = issue.ID;
+                        data.IssueID = m_issueList[i].ID;
+
+                        m_issueList[i].DeviceIndex.Add(index);
+                       
                         isNewIssue = false;
                         break;
                     }
                 }
                 if (isNewIssue)
                 {
-                    Issue issuedata = new Issue();
+                    CrashReport issuedata = new CrashReport();
                     issuedata.AddressList = addressString;
                     issuedata.Stactrace = backtraceData;
                     issuedata.ID = m_issueList.Count();
                     issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
                     issuedata.Name = issuedata.FolderName;
+                    issuedata.DeviceIndex.Add(index);
                     m_issueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
                 }
@@ -332,30 +335,33 @@ namespace CrashDiEmV2
                 //Get AddressString
                 string addressString = backtraceData[0] + backtraceData[1] + backtraceData[2] + backtraceData[numlineBacktrace - 1];
                 bool isNewIssue = true;
-                foreach (Issue issue in m_issueList)
+                for (int i = 0; i < m_issueList.Count(); i++)
                 {
-                    if (issue.AddressList == addressString)
+                    if (m_issueList[i].AddressList == addressString)
                     {
-                        data.IssueID = issue.ID;
+                        data.IssueID = m_issueList[i].ID;
+
+                        m_issueList[i].DeviceIndex.Add(index);
+
                         isNewIssue = false;
                         break;
                     }
                 }
                 if (isNewIssue)
                 {
-                    Issue issuedata = new Issue();
+                    CrashReport issuedata = new CrashReport();
                     issuedata.Name = backtraceData[0];
                     issuedata.AddressList = addressString;
                     issuedata.Stactrace = backtraceData;
                     issuedata.ID = m_issueList.Count();
                     issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
+                    issuedata.DeviceIndex.Add(index);
                     m_issueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
                 }
 
             }
-
-            return data;
+            m_CrashDataRaw[index] = data;
         }
         
         public void ProcessData()
@@ -392,7 +398,7 @@ namespace CrashDiEmV2
         public string[] GetBacktraceByID(int ID)
         {
             //Can opt by return index m_issueData[ID].Stactrace
-            foreach (Issue issue in m_issueList)
+            foreach (var issue in m_issueList)
             {
                 if (issue.ID == ID)
                 {

@@ -81,7 +81,6 @@ namespace CrashDiEmV2
                 textBox_arm.Text = fileName;
                 SaveSettings();
             }
-            dlg = null;
         }
 
         private void btn_x86_Click(object sender, EventArgs e)
@@ -100,7 +99,6 @@ namespace CrashDiEmV2
                 textBox_x86.Text = fileName;
                 SaveSettings();
             }
-            dlg = null;
         }
 
         private void btn_arm64_v8a_Click(object sender, EventArgs e)
@@ -119,7 +117,6 @@ namespace CrashDiEmV2
                 textBox_armV8.Text = fileName;
                 SaveSettings();
             }
-            dlg = null;
         }
 
         private void btn_x86_64_Click(object sender, EventArgs e)
@@ -138,7 +135,6 @@ namespace CrashDiEmV2
                 textBox_x86_64.Text = fileName;
                 SaveSettings();
             }
-            dlg = null;
         }
 
         private void btn_Select_crash_logs_Click(object sender, EventArgs e)
@@ -167,7 +163,6 @@ namespace CrashDiEmV2
                 textBox_CrashLogs.Text = folderPath;
                 SaveSettings();
             }
-            fbd = null;
         }
 
         private void btn_Analyse_Click(object sender, EventArgs e)
@@ -182,7 +177,10 @@ namespace CrashDiEmV2
                 btn_Analyse_ChangeStage(false);
                 backgroundWorker1.RunWorkerAsync();
             }
-
+            listView_Issue.Items.Clear();
+            listView_Devices.Items.Clear();
+            listView3.Items.Clear();
+            listView4.Items.Clear();
         }
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -275,10 +273,9 @@ namespace CrashDiEmV2
         private void listView_Devices_SelectedIndexChanged(object sender, EventArgs e)
         {
             textBox_Resultt.Clear();
-            int index = 0;
             if (listView_Devices.SelectedItems.Count > 0)
             {
-                index = listView_Devices.SelectedIndices[0];
+                var index = listView_Devices.SelectedIndices[0];
                 PostData_DeviceList(index);
             }
         }
@@ -354,7 +351,7 @@ namespace CrashDiEmV2
             int index = 0;
             foreach (var issue in issueList)
             {
-                var item = new ListViewItem(new string[] { index.ToString(), "0", issue.Name });
+                var item = new ListViewItem(new string[] { index.ToString(), issue.DeviceIndex.Count().ToString(), issue.Name });
                 listView_Issue.Items.Add(item);
                 index++;
             }
