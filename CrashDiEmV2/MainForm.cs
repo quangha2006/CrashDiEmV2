@@ -348,27 +348,33 @@ namespace CrashDiEmV2
         private void ShowData_Issue_ByAddress()
         {
             var issueList = m_analyzeData.IssuesList;
-            int index = 0;
             foreach (var issue in issueList)
             {
-                var item = new ListViewItem(new string[] { index.ToString(), issue.DeviceIndex.Count().ToString(), issue.Name });
+                var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count().ToString(), issue.Name });
                 listView_Issue.Items.Add(item);
-                index++;
             }
         }
         private void ShowData_Issue_ByGoogle()
         {
             var issueList = m_analyzeData.IssuesList;
-            int index = 0;
             List<string> issueAdded = new List<string>();
+
             foreach (var issue in issueList)
             {
                 if (!issueAdded.Contains(issue.FolderName))
                 {
-                    var item = new ListViewItem(new string[] { index.ToString(), "0", issue.FolderName });
+                    var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count.ToString(), issue.FolderName });
                     listView_Issue.Items.Add(item);
-                    index++;
                     issueAdded.Add(issue.FolderName);
+                }
+                else // Get Index and increase num report 
+                {
+                    int indexlistview = issueAdded.IndexOf(issue.FolderName);
+                    int currentValue = int.Parse(listView_Issue.Items[indexlistview].SubItems[1].Text);
+
+                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValue + issue.DeviceIndex.Count).ToString();
+                    if (issue.FolderName == "CrashTop_2")
+                        Console.WriteLine("CrashTop_2 index = " + indexlistview + " currentValue = " + currentValue + " added = " + issue.DeviceIndex.Count);
                 }
             }
         }

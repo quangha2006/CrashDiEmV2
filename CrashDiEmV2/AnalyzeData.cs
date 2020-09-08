@@ -189,7 +189,7 @@ namespace CrashDiEmV2
             string Devicebrand = lines[8];
             string APIlevel = lines[9];
             string architecture = lines[10];
-
+            string folderName = Path.GetFileName(Path.GetDirectoryName(path));
             CrashData data = new CrashData(path);
 
             data.CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash;
@@ -210,7 +210,7 @@ namespace CrashDiEmV2
             {
                 Console.WriteLine("FormatException: value: " + APIlevel + " Path:" + path);
             }
-            
+
             switch(architecture.Substring(architecture.IndexOf(':') + 2))
             {
                 case "N/A":
@@ -292,12 +292,15 @@ namespace CrashDiEmV2
                 bool isNewIssue = true;
                 for(int i = 0; i < m_issueList.Count(); i++)
                 {
-                    if (m_issueList[i].AddressList == addressString)
+                    if (m_issueList[i].AddressList == addressString && m_issueList[i].FolderName == folderName)
                     {
                         data.IssueID = m_issueList[i].ID;
 
                         m_issueList[i].DeviceIndex.Add(index);
-                       
+                        if (Path.GetFileName(Path.GetDirectoryName(path)) == "CrashTop_2")
+                        {
+                            Console.WriteLine("Add device to " + i + "Issue Folder: " + m_issueList[i].FolderName + " Currrent device: " + m_issueList[i].DeviceIndex.Count);
+                        }
                         isNewIssue = false;
                         break;
                     }
@@ -313,6 +316,10 @@ namespace CrashDiEmV2
                     issuedata.DeviceIndex.Add(index);
                     m_issueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
+                    if (issuedata.FolderName == "CrashTop_2")
+                    {
+                        Console.WriteLine("Create new issue in folder CrashTop_2 ID = " + issuedata.ID);
+                    }
                 }
             } // end native crash
             else // Java Crash
@@ -337,7 +344,7 @@ namespace CrashDiEmV2
                 bool isNewIssue = true;
                 for (int i = 0; i < m_issueList.Count(); i++)
                 {
-                    if (m_issueList[i].AddressList == addressString)
+                    if (m_issueList[i].AddressList == addressString && m_issueList[i].FolderName == folderName)
                     {
                         data.IssueID = m_issueList[i].ID;
 
@@ -361,6 +368,7 @@ namespace CrashDiEmV2
                 }
 
             }
+            
             m_CrashDataRaw[index] = data;
         }
         
