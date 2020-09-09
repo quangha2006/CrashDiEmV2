@@ -17,6 +17,7 @@ namespace CrashDiEmV2
         private AppSettings m_appSettings = new AppSettings();
         public delegate void SetUpProgressBarDelegate(int minimum, int maximum, bool enable = true, string customText = null);
         private string m_dataToShow;
+        private ListViewColumnSorter lvwColumnSorter;
         public MainForm()
         {
             InitializeComponent();
@@ -30,6 +31,9 @@ namespace CrashDiEmV2
             backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
             backgroundWorker1.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
             numericUpDown_MaxLineOfStackToShow.Value = 20;
+            lvwColumnSorter = new ListViewColumnSorter();
+            this.listView_Devices.ListViewItemSorter = lvwColumnSorter;
+            listView_Devices.ColumnClick += ListView_Devices_ColumnClick;
             //Load Setting
             if (m_appSettings.LoadSettings())
             {
@@ -39,7 +43,9 @@ namespace CrashDiEmV2
                 textBox_x86_64.Text = m_appSettings.X86_64SoPath;
                 textBox_CrashLogs.Text = m_appSettings.CrashLogPath;
             }
+
         }
+
         private void SaveSettings()
         {
             m_appSettings.ArmSoPath = textBox_arm.Text;
@@ -418,6 +424,31 @@ namespace CrashDiEmV2
                 }
             }
             textBox_Resultt.Text = m_dataToShow;
+        }
+        private void ListView_Devices_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine if clicked column is already the column that is being sorted.
+            if (e.Column == lvwColumnSorter.SortColumn)
+            {
+                // Reverse the current sort direction for this column.
+                if (lvwColumnSorter.Order == SortOrder.Ascending)
+                {
+                    lvwColumnSorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    lvwColumnSorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                // Set the column number that is to be sorted; default to ascending.
+                lvwColumnSorter.SortColumn = e.Column;
+                lvwColumnSorter.Order = SortOrder.Ascending;
+            }
+
+            // Perform the sort with these new sort options.
+            this.listView_Devices.Sort();
         }
     }
 }

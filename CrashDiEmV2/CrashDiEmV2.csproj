@@ -78,6 +78,7 @@
     <Compile Include="AnalyzeData.cs" />
     <Compile Include="AppSettings.cs" />
     <Compile Include="CrashReport.cs" />
+    <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="TextProgressBar.cs">
       <SubType>Component</SubType>
     </Compile>

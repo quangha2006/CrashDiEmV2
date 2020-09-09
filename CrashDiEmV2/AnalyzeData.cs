@@ -268,8 +268,10 @@ namespace CrashDiEmV2
                             int start = currentLine.IndexOf('/');
                             int end = currentLine.IndexOf('(');
                             int len = end - start;
-
-                            backtraceData[i] = currentLine.Remove(start, len);
+                            if (len > 0)
+                                backtraceData[i] = currentLine.Remove(start, len);
+                            else
+                                backtraceData[i] = currentLine;
                         }
                         else
                         {
