@@ -92,7 +92,8 @@ namespace CrashDiEmV2
         private string m_DataPath;
         private CrashData[] m_CrashDataRaw;
         private List<CrashReport> m_issueList;
-        private int m_numFiles = 0;
+        private int m_numTxtFiles = 0;
+        private int m_numReportLoaded = 0;
         private List<Device> m_DevicesList = new List<Device>(); 
 
         public string LogCrashPath
@@ -106,12 +107,20 @@ namespace CrashDiEmV2
                 return m_DataPath;
             }
         }
-        public int ReportCount
+        public int TxtCount
         {
             get
             {
-                m_numFiles = Directory.GetFiles(m_DataPath, "*.txt", SearchOption.AllDirectories).Length;
-                return m_numFiles;
+                if (m_numTxtFiles == 0)
+                    m_numTxtFiles = Directory.GetFiles(m_DataPath, "*.txt", SearchOption.AllDirectories).Length;
+                return m_numTxtFiles;
+            }
+        }
+        public int ReportLoaded
+        {
+            get
+            {
+                return m_numReportLoaded;
             }
         }
         public ref List<CrashReport> IssuesList
@@ -131,16 +140,17 @@ namespace CrashDiEmV2
         private void ClearAndReInitData()
         {
             //Clear Old Data
+            m_numReportLoaded = 0;
             m_CrashDataRaw = null;
-            m_CrashDataRaw = new CrashData[m_numFiles];
-            m_issueList = null;
-            m_issueList = new List<CrashReport>();
             m_DevicesList = null;
+            m_issueList = null;
+            m_CrashDataRaw = new CrashData[this.TxtCount];
+            m_issueList = new List<CrashReport>();
             m_DevicesList = new List<Device>();
         }
         public int LoadCrashLogs(BackgroundWorker backgroundWorker, MySetting setting)
         {
-            if (m_numFiles < 0)
+            if (this.TxtCount < 0)
                 return 0;
 
             ClearAndReInitData();
@@ -174,8 +184,8 @@ namespace CrashDiEmV2
                 totalTime += (milliseconds_end - milliseconds_start);
             }
             
-            Console.WriteLine("Time to load " + index + " files: " + totalTime);
-            return index;
+            Console.WriteLine("Time to load " + this.ReportLoaded + " files: " + totalTime);
+            return this.ReportLoaded;
         }
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
         {
@@ -370,14 +380,14 @@ namespace CrashDiEmV2
                 }
 
             }
-            
+            m_numReportLoaded++;
             m_CrashDataRaw[index] = data;
         }
         
         public void ProcessData()
         {
             // Sumup Devices
-            for( int index = 0; index < m_CrashDataRaw.Count(); index++)
+            for( int index = 0; index < ReportLoaded; index++)
             {
                 CrashData data = m_CrashDataRaw[index];
                 bool isAdded = false;
@@ -419,7 +429,7 @@ namespace CrashDiEmV2
         }
         public ref CrashData GetCrashDataIndex(int index, ref bool found)
         {
-            if (index >=0 && index <= m_numFiles)
+            if (index >=0 && index <= m_numReportLoaded)
             {
                 found = true;
                 return ref m_CrashDataRaw[index];

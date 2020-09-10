@@ -43,6 +43,7 @@
             this.textBox_CrashLogs = new System.Windows.Forms.TextBox();
             this.btn_Select_crash_logs = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.progressBar1 = new CrashDiEmV2.TextProgressBar();
             this.checkBox_GroupIssueByGoogle = new System.Windows.Forms.CheckBox();
             this.checkBox_RemoveSOPath = new System.Windows.Forms.CheckBox();
             this.checkBox_parseDsym = new System.Windows.Forms.CheckBox();
@@ -63,6 +64,7 @@
             this.columnHeader_Name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_DvCode = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader_ReportCount = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader_index = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabPage_Arc = new System.Windows.Forms.TabPage();
             this.listView3 = new System.Windows.Forms.ListView();
             this.tabPage_Api = new System.Windows.Forms.TabPage();
@@ -74,7 +76,6 @@
             this.numericUpDown_MaxLineOfStackToShow = new System.Windows.Forms.NumericUpDown();
             this.label_NumLineStack = new System.Windows.Forms.Label();
             this.checkBox_showAddress = new System.Windows.Forms.CheckBox();
-            this.progressBar1 = new CrashDiEmV2.TextProgressBar();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -229,6 +230,19 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Analyse";
             // 
+            // progressBar1
+            // 
+            this.progressBar1.CustomText = "";
+            this.progressBar1.Location = new System.Drawing.Point(486, 19);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
+            this.progressBar1.Size = new System.Drawing.Size(234, 23);
+            this.progressBar1.TabIndex = 5;
+            this.progressBar1.TextColor = System.Drawing.Color.Black;
+            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
+            this.progressBar1.VisualMode = CrashDiEmV2.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
+            // 
             // checkBox_GroupIssueByGoogle
             // 
             this.checkBox_GroupIssueByGoogle.AutoSize = true;
@@ -362,7 +376,7 @@
             // column_STT
             // 
             this.column_STT.Text = "STT";
-            this.column_STT.Width = 36;
+            this.column_STT.Width = 0;
             // 
             // column_CountReport
             // 
@@ -372,7 +386,7 @@
             // column_Issue
             // 
             this.column_Issue.Text = "Issue";
-            this.column_Issue.Width = 238;
+            this.column_Issue.Width = 274;
             // 
             // tabPage_Devices
             // 
@@ -393,7 +407,8 @@
             this.columnHeader_Manufacture,
             this.columnHeader_Name,
             this.columnHeader_DvCode,
-            this.columnHeader_ReportCount});
+            this.columnHeader_ReportCount,
+            this.columnHeader_index});
             this.listView_Devices.FullRowSelect = true;
             this.listView_Devices.GridLines = true;
             this.listView_Devices.HideSelection = false;
@@ -424,6 +439,10 @@
             // 
             this.columnHeader_ReportCount.Text = "Report Count";
             this.columnHeader_ReportCount.Width = 100;
+            // 
+            // columnHeader_index
+            // 
+            this.columnHeader_index.Width = 0;
             // 
             // tabPage_Arc
             // 
@@ -532,19 +551,6 @@
             this.checkBox_showAddress.Text = "Show Crash Address";
             this.checkBox_showAddress.UseVisualStyleBackColor = true;
             // 
-            // progressBar1
-            // 
-            this.progressBar1.CustomText = "";
-            this.progressBar1.Location = new System.Drawing.Point(486, 19);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
-            this.progressBar1.Size = new System.Drawing.Size(234, 23);
-            this.progressBar1.TabIndex = 5;
-            this.progressBar1.TextColor = System.Drawing.Color.Black;
-            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
-            this.progressBar1.VisualMode = CrashDiEmV2.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
-            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -631,6 +637,7 @@
         private System.Windows.Forms.Label label_NumLineStack;
         private System.Windows.Forms.ColumnHeader column_Issue;
         private System.Windows.Forms.CheckBox checkBox_showAddress;
+        private System.Windows.Forms.ColumnHeader columnHeader_index;
     }
 }
 

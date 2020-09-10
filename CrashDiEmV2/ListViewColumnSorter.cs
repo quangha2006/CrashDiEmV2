@@ -58,8 +58,23 @@ namespace CrashDiEmV2
             listviewX = (ListViewItem)x;
             listviewY = (ListViewItem)y;
 
+            // Try to compare int
+
+            string stringX = listviewX.SubItems[ColumnToSort].Text;
+            string stringY = listviewY.SubItems[ColumnToSort].Text;
+
+            int nx;
+            int ny;
+            if (int.TryParse(stringX, out nx) && int.TryParse(stringY, out ny))
+            {
+                compareResult = nx.CompareTo(ny);
+            }
+            else
+                compareResult = ObjectCompare.Compare(stringX, stringY);
+
+
             // Compare the two items
-            compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
+            //compareResult = ObjectCompare.Compare(listviewX.SubItems[ColumnToSort].Text, listviewY.SubItems[ColumnToSort].Text);
 
             // Calculate correct return value based on object comparison
             if (OrderOfSort == SortOrder.Ascending)

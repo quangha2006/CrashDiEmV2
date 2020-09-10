@@ -17,7 +17,8 @@ namespace CrashDiEmV2
         private AppSettings m_appSettings = new AppSettings();
         public delegate void SetUpProgressBarDelegate(int minimum, int maximum, bool enable = true, string customText = null);
         private string m_dataToShow;
-        private ListViewColumnSorter lvwColumnSorter;
+        private ListViewColumnSorter lvDevicesColumnSorter;
+        private ListViewColumnSorter lvIssueColumnSorter;
         public MainForm()
         {
             InitializeComponent();
@@ -31,9 +32,21 @@ namespace CrashDiEmV2
             backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
             backgroundWorker1.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
             numericUpDown_MaxLineOfStackToShow.Value = 20;
-            lvwColumnSorter = new ListViewColumnSorter();
-            this.listView_Devices.ListViewItemSorter = lvwColumnSorter;
+
+            lvDevicesColumnSorter = new ListViewColumnSorter();
+            //lvDevicesColumnSorter.SortColumn = 3; // Collumn reportCount
+            //lvDevicesColumnSorter.Order = SortOrder.Descending;
+            listView_Devices.ListViewItemSorter = lvDevicesColumnSorter;
             listView_Devices.ColumnClick += ListView_Devices_ColumnClick;
+
+
+
+            lvIssueColumnSorter = new ListViewColumnSorter();
+            //lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
+            //lvIssueColumnSorter.Order = SortOrder.Descending;
+
+            listView_Issue.ListViewItemSorter = lvIssueColumnSorter;
+            listView_Issue.ColumnClick += ListView_Issue_ColumnClick;
             //Load Setting
             if (m_appSettings.LoadSettings())
             {
@@ -191,7 +204,7 @@ namespace CrashDiEmV2
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
             m_analyzeData.LogCrashPath = textBox_CrashLogs.Text;
-            int fCount = m_analyzeData.ReportCount;
+            int fCount = m_analyzeData.TxtCount;
             if (fCount > 0)
             {
                 this.Invoke((MethodInvoker)delegate
@@ -233,6 +246,9 @@ namespace CrashDiEmV2
                 ShowData_Issue_ByAddress();
             // Show Data_DeviceList;
             ShowData_Device();
+
+            //listView_Issue.Sort();
+            //listView_Devices.Sort();
         }
         public void SetUpProgressBar(int minimum, int maximum, bool enable = true, string customText = null)
         {
@@ -281,8 +297,8 @@ namespace CrashDiEmV2
             textBox_Resultt.Clear();
             if (listView_Devices.SelectedItems.Count > 0)
             {
-                var index = listView_Devices.SelectedIndices[0];
-                PostData_DeviceList(index);
+                var item = listView_Devices.SelectedItems[0];
+                PostData_DeviceList(int.Parse(item.SubItems[4].Text));
             }
         }
         private void PostData_DeviceList(int index)
@@ -347,16 +363,16 @@ namespace CrashDiEmV2
             var devicesList = m_analyzeData.DevicesList;
             foreach (var device in devicesList)
             {
-                var item = new ListViewItem(new string[] { device.DeviceBrand, device.DeviceName, device.DeviceModel, device.CrashLogIndex.Count().ToString() });
+                var item = new ListViewItem(new string[] { device.DeviceBrand, device.DeviceName, device.DeviceModel, device.CrashLogIndex.Count().ToString(), listView_Devices.Items.Count.ToString() });
                 listView_Devices.Items.Add(item);
             }
         }
         private void ShowData_Issue_ByAddress()
         {
             var issueList = m_analyzeData.IssuesList;
-            foreach (var issue in issueList)
+            for (int i = 0; i < issueList.Count; i++)
             {
-                var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count().ToString(), issue.Name });
+                var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issueList[i].DeviceIndex.Count().ToString(), issueList[i].Name });
                 listView_Issue.Items.Add(item);
             }
         }
@@ -365,22 +381,22 @@ namespace CrashDiEmV2
             var issueList = m_analyzeData.IssuesList;
             List<string> issueAdded = new List<string>();
 
-            foreach (var issue in issueList)
+            for (int i = 0; i < issueList.Count; i++)
             {
-                if (!issueAdded.Contains(issue.FolderName))
+                if (!issueAdded.Contains(issueList[i].FolderName))
                 {
-                    var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count.ToString(), issue.FolderName });
+                    var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issueList[i].DeviceIndex.Count.ToString(), issueList[i].FolderName });
                     listView_Issue.Items.Add(item);
-                    issueAdded.Add(issue.FolderName);
+                    issueAdded.Add(issueList[i].FolderName);
                 }
                 else // Get Index and increase num report 
                 {
-                    int indexlistview = issueAdded.IndexOf(issue.FolderName);
+                    int indexlistview = issueAdded.IndexOf(issueList[i].FolderName);
                     int currentValue = int.Parse(listView_Issue.Items[indexlistview].SubItems[1].Text);
 
-                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValue + issue.DeviceIndex.Count).ToString();
-                    if (issue.FolderName == "CrashTop_2")
-                        Console.WriteLine("CrashTop_2 index = " + indexlistview + " currentValue = " + currentValue + " added = " + issue.DeviceIndex.Count);
+                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValue + issueList[i].DeviceIndex.Count).ToString();
+                    if (issueList[i].FolderName == "CrashTop_2")
+                        Console.WriteLine("CrashTop_2 index = " + indexlistview + " currentValue = " + currentValue + " added = " + issueList[i].DeviceIndex.Count);
                 }
             }
         }
@@ -428,27 +444,54 @@ namespace CrashDiEmV2
         private void ListView_Devices_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             // Determine if clicked column is already the column that is being sorted.
-            if (e.Column == lvwColumnSorter.SortColumn)
+            if (e.Column == lvDevicesColumnSorter.SortColumn)
             {
                 // Reverse the current sort direction for this column.
-                if (lvwColumnSorter.Order == SortOrder.Ascending)
+                if (lvDevicesColumnSorter.Order == SortOrder.Ascending)
                 {
-                    lvwColumnSorter.Order = SortOrder.Descending;
+                    lvDevicesColumnSorter.Order = SortOrder.Descending;
                 }
                 else
                 {
-                    lvwColumnSorter.Order = SortOrder.Ascending;
+                    lvDevicesColumnSorter.Order = SortOrder.Ascending;
                 }
             }
             else
             {
                 // Set the column number that is to be sorted; default to ascending.
-                lvwColumnSorter.SortColumn = e.Column;
-                lvwColumnSorter.Order = SortOrder.Ascending;
+                lvDevicesColumnSorter.SortColumn = e.Column;
+                lvDevicesColumnSorter.Order = SortOrder.Ascending;
             }
 
             // Perform the sort with these new sort options.
             this.listView_Devices.Sort();
         }
+
+        private void ListView_Issue_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            // Determine if clicked column is already the column that is being sorted.
+            if (e.Column == lvIssueColumnSorter.SortColumn)
+            {
+                // Reverse the current sort direction for this column.
+                if (lvIssueColumnSorter.Order == SortOrder.Ascending)
+                {
+                    lvIssueColumnSorter.Order = SortOrder.Descending;
+                }
+                else
+                {
+                    lvIssueColumnSorter.Order = SortOrder.Ascending;
+                }
+            }
+            else
+            {
+                // Set the column number that is to be sorted; default to ascending.
+                lvIssueColumnSorter.SortColumn = e.Column;
+                lvIssueColumnSorter.Order = SortOrder.Ascending;
+            }
+
+            // Perform the sort with these new sort options.
+            this.listView_Issue.Sort();
+        }
+
     }
 }
