@@ -118,19 +118,37 @@ namespace CrashDiEmV2
         }
         public int ReportLoaded
         {
+            private set
+            {
+                m_numReportLoaded = value;
+            }
             get
             {
                 return m_numReportLoaded;
             }
         }
-        public ref List<CrashReport> IssuesList
+        public List<CrashReport> IssuesList
+        {
+            get
+            {
+                return m_issueList;
+            }
+        }
+        public ref List<CrashReport> IssuesListRef
         {
             get
             {
                 return ref m_issueList;
             }
         }
-        public ref List<AnalyzeData.Device> DevicesList
+        public List<AnalyzeData.Device> DevicesList
+        {
+            get
+            {
+                return m_DevicesList;
+            }
+        }
+        public ref List<AnalyzeData.Device> DevicesListRef
         {
             get
             {

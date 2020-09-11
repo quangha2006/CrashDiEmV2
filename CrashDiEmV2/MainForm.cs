@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,7 +16,8 @@ namespace CrashDiEmV2
     {
         private AnalyzeData m_analyzeData = new AnalyzeData();
         private AppSettings m_appSettings = new AppSettings();
-        public delegate void SetUpProgressBarDelegate(int minimum, int maximum, bool enable = true, string customText = null);
+        //public delegate void SetUpProgressBarDelegate(int minimum, int maximum, bool enable = true, string customText = null);
+        //public delegate void SortListViewIssueDelegate();
         private string m_dataToShow;
         private ListViewColumnSorter lvDevicesColumnSorter;
         private ListViewColumnSorter lvIssueColumnSorter;
@@ -34,17 +36,10 @@ namespace CrashDiEmV2
             numericUpDown_MaxLineOfStackToShow.Value = 20;
 
             lvDevicesColumnSorter = new ListViewColumnSorter();
-            //lvDevicesColumnSorter.SortColumn = 3; // Collumn reportCount
-            //lvDevicesColumnSorter.Order = SortOrder.Descending;
             listView_Devices.ListViewItemSorter = lvDevicesColumnSorter;
             listView_Devices.ColumnClick += ListView_Devices_ColumnClick;
 
-
-
             lvIssueColumnSorter = new ListViewColumnSorter();
-            //lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
-            //lvIssueColumnSorter.Order = SortOrder.Descending;
-
             listView_Issue.ListViewItemSorter = lvIssueColumnSorter;
             listView_Issue.ColumnClick += ListView_Issue_ColumnClick;
             //Load Setting
@@ -220,7 +215,7 @@ namespace CrashDiEmV2
                 {
                     this.Invoke((MethodInvoker)delegate
                     {
-                    SetUpProgressBar(0, fCount, true, "Parsing");
+                        SetUpProgressBar(0, fCount, true, "Parsing");
                     });
                     m_analyzeData.ProcessData();
 
@@ -247,8 +242,13 @@ namespace CrashDiEmV2
             // Show Data_DeviceList;
             ShowData_Device();
 
-            //listView_Issue.Sort();
-            //listView_Devices.Sort();
+            lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
+            lvIssueColumnSorter.Order = SortOrder.Descending;
+            listView_Issue.Sort();
+
+            lvDevicesColumnSorter.SortColumn = 3;
+            lvDevicesColumnSorter.Order = SortOrder.Descending;
+            listView_Devices.Sort();
         }
         public void SetUpProgressBar(int minimum, int maximum, bool enable = true, string customText = null)
         {
@@ -303,7 +303,7 @@ namespace CrashDiEmV2
         }
         private void PostData_DeviceList(int index)
         {
-            var devicesList = m_analyzeData.DevicesList;
+            var devicesList = m_analyzeData.DevicesListRef;
 
             List<int> dataList = devicesList[index].CrashLogIndex;
             //string m_dataToShow;
@@ -360,7 +360,7 @@ namespace CrashDiEmV2
         }
         private void ShowData_Device()
         {
-            var devicesList = m_analyzeData.DevicesList;
+            var devicesList = m_analyzeData.DevicesListRef;
             foreach (var device in devicesList)
             {
                 var item = new ListViewItem(new string[] { device.DeviceBrand, device.DeviceName, device.DeviceModel, device.CrashLogIndex.Count().ToString(), listView_Devices.Items.Count.ToString() });
@@ -369,7 +369,7 @@ namespace CrashDiEmV2
         }
         private void ShowData_Issue_ByAddress()
         {
-            var issueList = m_analyzeData.IssuesList;
+            var issueList = m_analyzeData.IssuesListRef;
             for (int i = 0; i < issueList.Count; i++)
             {
                 var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issueList[i].DeviceIndex.Count().ToString(), issueList[i].Name });
@@ -378,7 +378,7 @@ namespace CrashDiEmV2
         }
         private void ShowData_Issue_ByGoogle()
         {
-            var issueList = m_analyzeData.IssuesList;
+            var issueList = m_analyzeData.IssuesListRef;
             List<string> issueAdded = new List<string>();
 
             for (int i = 0; i < issueList.Count; i++)
@@ -414,7 +414,7 @@ namespace CrashDiEmV2
         }
         private void PostData_IssueList(string issueName)
         {
-            var issueList = m_analyzeData.IssuesList;
+            var issueList = m_analyzeData.IssuesListRef;
             m_dataToShow = "";
             foreach(var issue in issueList)
             {
@@ -493,5 +493,10 @@ namespace CrashDiEmV2
             this.listView_Issue.Sort();
         }
 
+        private void btn_Save_Click(object sender, EventArgs e)
+        {
+            string json = JsonConvert.SerializeObject(m_analyzeData);
+            File.WriteAllText("TestSave.json", json);
+        }
     }
 }
