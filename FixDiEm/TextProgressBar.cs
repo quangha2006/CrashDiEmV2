@@ -7,7 +7,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace CrashDiEmV2
+namespace FixDiEm
 {
     class TextProgressBar : ProgressBar
     {

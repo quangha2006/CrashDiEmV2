@@ -10,7 +10,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Runtime.Serialization.Formatters;
 
-namespace CrashDiEmV2
+namespace FixDiEm
 {
     class AnalyzeData
     {
@@ -465,5 +465,13 @@ namespace CrashDiEmV2
             found = false;
             return ref m_CrashDataRaw[0];
         }
+        public ref CrashData[] CrashReportRawRef
+        {
+            get
+            {
+                return ref m_CrashDataRaw;
+            }
+        }
+
     }
 }

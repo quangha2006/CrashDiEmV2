@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace CrashDiEmV2
+namespace FixDiEm
 {
     class AppSettings
     {

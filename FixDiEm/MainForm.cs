@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CrashDiEmV2
+namespace FixDiEm
 {
     public partial class MainForm : Form
     {
@@ -416,13 +416,30 @@ namespace CrashDiEmV2
         private void PostData_IssueList(string issueName)
         {
             var issueList = m_analyzeData.IssuesListRef;
+            var crashreportraw = m_analyzeData.CrashReportRawRef;
             m_dataToShow = "";
             foreach(var issue in issueList)
             {
                 if (issue.FolderName == issueName)
                 {
-                    m_dataToShow += ("backtrace:\r\n");
-                    m_dataToShow += ("\r\n");
+                    for(int i = 0; i < m_analyzeData.ReportLoaded; i++)
+                    {
+                        if (crashreportraw[i].IssueID == issue.ID)
+                        {
+                            m_dataToShow += (crashreportraw[i].Path + "\r\n");
+                            m_dataToShow += ("App code: " + crashreportraw[i].AppCode + "\r\n");
+                            m_dataToShow += ("Version Code: " + crashreportraw[i].VersionCode + "\r\n");
+                            m_dataToShow += ("Date time: " + crashreportraw[i].DateTime + "\r\n");
+                            m_dataToShow += ("Device: " + crashreportraw[i].DeviceBrand + " " + crashreportraw[i].DeviceName + " " + crashreportraw[i].DeviceModel + "\r\n");
+                            m_dataToShow += ("Architecture: " + crashreportraw[i].GetArchitectureAsString() + "\r\n");
+                            m_dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n");
+                            m_dataToShow += ("backtrace:\r\n");
+
+                            m_dataToShow += ("\r\n");
+                            break; // Fix late
+                        }
+                    }
+
                     int collectData_Count = issue.Stactrace.Count();
                     for (int i = 0; i < collectData_Count; i++)
                     {

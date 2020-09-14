@@ -9,7 +9,7 @@ using System.Windows.Forms;
 /// <summary>
 /// This class is an implementation of the 'IComparer' interface.
 /// </summary>
-namespace CrashDiEmV2
+namespace FixDiEm
 {
     class ListViewColumnSorter : IComparer
     {
