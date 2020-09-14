@@ -43,7 +43,6 @@
             this.textBox_CrashLogs = new System.Windows.Forms.TextBox();
             this.btn_Select_crash_logs = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.progressBar1 = new CrashDiEmV2.TextProgressBar();
             this.checkBox_GroupIssueByGoogle = new System.Windows.Forms.CheckBox();
             this.checkBox_RemoveSOPath = new System.Windows.Forms.CheckBox();
             this.checkBox_parseDsym = new System.Windows.Forms.CheckBox();
@@ -218,7 +217,6 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.progressBar1);
             this.groupBox3.Controls.Add(this.checkBox_GroupIssueByGoogle);
             this.groupBox3.Controls.Add(this.checkBox_RemoveSOPath);
             this.groupBox3.Controls.Add(this.checkBox_parseDsym);
@@ -229,19 +227,6 @@
             this.groupBox3.TabIndex = 8;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Analyse";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.CustomText = "";
-            this.progressBar1.Location = new System.Drawing.Point(486, 19);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
-            this.progressBar1.Size = new System.Drawing.Size(234, 23);
-            this.progressBar1.TabIndex = 5;
-            this.progressBar1.TextColor = System.Drawing.Color.Black;
-            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
-            this.progressBar1.VisualMode = CrashDiEmV2.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
-            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
             // 
             // checkBox_GroupIssueByGoogle
             // 
@@ -570,7 +555,7 @@
             this.Controls.Add(this.groupBox1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
-            this.Text = "CrashDiEm_V2 | quang.haduy@gameloft.com";
+            this.Text = "FixDiEm | quang.haduy@gameloft.com";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
