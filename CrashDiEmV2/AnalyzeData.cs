@@ -361,42 +361,49 @@ namespace CrashDiEmV2
                         break;
                     backtraceBeginLine++;
                 }
-                // process backtrace:
-                int numlineBacktrace = lines.Count() - backtraceBeginLine - 1;
-                string[] backtraceData = new string[numlineBacktrace];
-                for (int i = 0; i < numlineBacktrace; i++)
+                if (backtraceBeginLine == lines.Count())
                 {
-                    backtraceData[i] =  lines[i + backtraceBeginLine];
+                    Console.WriteLine("Not found backtrace in " + path);
+                    data.IssueID = -1;
                 }
-                //Check issue and add to list
-                //Get AddressString
-                string addressString = backtraceData[0] + backtraceData[1] + backtraceData[2] + backtraceData[numlineBacktrace - 1];
-                bool isNewIssue = true;
-                for (int i = 0; i < m_issueList.Count(); i++)
+                else
                 {
-                    if (m_issueList[i].AddressList == addressString && m_issueList[i].FolderName == folderName)
+                    // process backtrace:
+                    int numlineBacktrace = lines.Count() - backtraceBeginLine - 1;
+                    string[] backtraceData = new string[numlineBacktrace];
+                    for (int i = 0; i < numlineBacktrace; i++)
                     {
-                        data.IssueID = m_issueList[i].ID;
+                        backtraceData[i] = lines[i + backtraceBeginLine];
+                    }
+                    //Check issue and add to list
+                    //Get AddressString
+                    string addressString = backtraceData[0] + backtraceData[1] + backtraceData[2] + backtraceData[numlineBacktrace - 1];
+                    bool isNewIssue = true;
+                    for (int i = 0; i < m_issueList.Count(); i++)
+                    {
+                        if (m_issueList[i].AddressList == addressString && m_issueList[i].FolderName == folderName)
+                        {
+                            data.IssueID = m_issueList[i].ID;
 
-                        m_issueList[i].DeviceIndex.Add(index);
+                            m_issueList[i].DeviceIndex.Add(index);
 
-                        isNewIssue = false;
-                        break;
+                            isNewIssue = false;
+                            break;
+                        }
+                    }
+                    if (isNewIssue)
+                    {
+                        CrashReport issuedata = new CrashReport();
+                        issuedata.Name = backtraceData[0];
+                        issuedata.AddressList = addressString;
+                        issuedata.Stactrace = backtraceData;
+                        issuedata.ID = m_issueList.Count();
+                        issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
+                        issuedata.DeviceIndex.Add(index);
+                        m_issueList.Add(issuedata);
+                        data.IssueID = issuedata.ID;
                     }
                 }
-                if (isNewIssue)
-                {
-                    CrashReport issuedata = new CrashReport();
-                    issuedata.Name = backtraceData[0];
-                    issuedata.AddressList = addressString;
-                    issuedata.Stactrace = backtraceData;
-                    issuedata.ID = m_issueList.Count();
-                    issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
-                    issuedata.DeviceIndex.Add(index);
-                    m_issueList.Add(issuedata);
-                    data.IssueID = issuedata.ID;
-                }
-
             }
             m_numReportLoaded++;
             m_CrashDataRaw[index] = data;
@@ -436,6 +443,9 @@ namespace CrashDiEmV2
         public string[] GetBacktraceByID(int ID)
         {
             //Can opt by return index m_issueData[ID].Stactrace
+            if (ID == -1)
+                return null;
+
             foreach (var issue in m_issueList)
             {
                 if (issue.ID == ID)

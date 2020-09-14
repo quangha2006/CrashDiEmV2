@@ -171,6 +171,7 @@ namespace CrashDiEmV2
             //    }
 
             FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.SelectedPath = textBox_CrashLogs.Text;
             if (fbd.ShowDialog() == DialogResult.OK)
             {
                 string folderPath = fbd.SelectedPath;
