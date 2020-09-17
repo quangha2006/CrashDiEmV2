@@ -516,5 +516,10 @@ namespace FixDiEm
             string json = JsonConvert.SerializeObject(m_analyzeData);
             File.WriteAllText("TestSave.json", json);
         }
+
+        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        {
+
+        }
     }
 }

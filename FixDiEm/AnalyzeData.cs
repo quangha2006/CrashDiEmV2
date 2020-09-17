@@ -58,9 +58,6 @@ namespace FixDiEm
             {
                 switch (this.architecture)
                 {
-                    case Architecture.Unknow:
-                        return "Unknow";
-
                     case Architecture.arm64_v8a:
                         return "arm64-v8a";
                     case Architecture.armeabi_v7a:
@@ -69,6 +66,7 @@ namespace FixDiEm
                         return "x86";
                     case Architecture.x86_64:
                         return "x86_64";
+                    case Architecture.Unknow:
                     default:
                         return "Unknow";
                 }

@@ -76,6 +76,7 @@
             this.numericUpDown_MaxLineOfStackToShow = new System.Windows.Forms.NumericUpDown();
             this.label_NumLineStack = new System.Windows.Forms.Label();
             this.checkBox_showAddress = new System.Windows.Forms.CheckBox();
+            this.backgroundWorker_PostData = new System.ComponentModel.BackgroundWorker();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -552,6 +553,10 @@
             this.checkBox_showAddress.Text = "Show Crash Address";
             this.checkBox_showAddress.UseVisualStyleBackColor = true;
             // 
+            // backgroundWorker_PostData
+            // 
+            this.backgroundWorker_PostData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -639,6 +644,7 @@
         private System.Windows.Forms.ColumnHeader column_Issue;
         private System.Windows.Forms.CheckBox checkBox_showAddress;
         private System.Windows.Forms.ColumnHeader columnHeader_index;
+        private System.ComponentModel.BackgroundWorker backgroundWorker_PostData;
     }
 }
 
