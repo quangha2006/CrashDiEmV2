@@ -43,7 +43,6 @@
             this.textBox_CrashLogs = new System.Windows.Forms.TextBox();
             this.btn_Select_crash_logs = new System.Windows.Forms.Button();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.progressBar1 = new FixDiEm.TextProgressBar();
             this.checkBox_GroupIssueByGoogle = new System.Windows.Forms.CheckBox();
             this.checkBox_RemoveSOPath = new System.Windows.Forms.CheckBox();
             this.checkBox_parseDsym = new System.Windows.Forms.CheckBox();
@@ -77,6 +76,7 @@
             this.label_NumLineStack = new System.Windows.Forms.Label();
             this.checkBox_showAddress = new System.Windows.Forms.CheckBox();
             this.backgroundWorker_PostData = new System.ComponentModel.BackgroundWorker();
+            this.progressBar1 = new FixDiEm.TextProgressBar();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -231,19 +231,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Analyse";
             // 
-            // progressBar1
-            // 
-            this.progressBar1.CustomText = "";
-            this.progressBar1.Location = new System.Drawing.Point(486, 19);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
-            this.progressBar1.Size = new System.Drawing.Size(234, 23);
-            this.progressBar1.TabIndex = 5;
-            this.progressBar1.TextColor = System.Drawing.Color.Black;
-            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
-            this.progressBar1.VisualMode = FixDiEm.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
-            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
-            // 
             // checkBox_GroupIssueByGoogle
             // 
             this.checkBox_GroupIssueByGoogle.AutoSize = true;
@@ -319,6 +306,7 @@
             this.btn_Load.TabIndex = 1;
             this.btn_Load.Text = "Load";
             this.btn_Load.UseVisualStyleBackColor = true;
+            this.btn_Load.Click += new System.EventHandler(this.btn_Load_Click);
             // 
             // btn_Save
             // 
@@ -556,6 +544,19 @@
             // backgroundWorker_PostData
             // 
             this.backgroundWorker_PostData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
+            // 
+            // progressBar1
+            // 
+            this.progressBar1.CustomText = "";
+            this.progressBar1.Location = new System.Drawing.Point(486, 19);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.ProgressColor = System.Drawing.Color.LightGreen;
+            this.progressBar1.Size = new System.Drawing.Size(234, 23);
+            this.progressBar1.TabIndex = 5;
+            this.progressBar1.TextColor = System.Drawing.Color.Black;
+            this.progressBar1.TextFont = new System.Drawing.Font("Times New Roman", 11F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))));
+            this.progressBar1.VisualMode = FixDiEm.TextProgressBar.ProgressBarDisplayMode.CurrProgress;
+            this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
             // 
             // MainForm
             // 

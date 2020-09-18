@@ -341,7 +341,29 @@ namespace FixDiEm
                         int collectData_Count = collectData.Count();
                         for (int i = 0; i < collectData_Count; i ++)
                         {
-                            m_dataToShow += (collectData[i] + "\r\n");
+                            string crashline = collectData[i] + "\r\n";
+                            if (checkBox_showAddress.Checked)
+                            {
+                                m_dataToShow += crashline;
+                            }
+                            else
+                            {
+                                if (crashline.Contains("  pc "))
+                                {
+                                    int begin = crashline.IndexOf('p');
+                                    int end = Math.Min(crashline.IndexOf('/'), crashline.IndexOf('('));
+                                    int leng = end - begin;
+                                    if (leng > 0)
+                                    {
+                                        m_dataToShow += crashline.Remove(begin, leng);
+                                    }
+                                    else
+                                        m_dataToShow += crashline;
+                                }
+                                else
+                                    m_dataToShow += crashline;
+
+                            }
                             if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                             {
                                 m_dataToShow += ((collectData_Count - i - 1)  + " more lines....\r\n");
@@ -396,8 +418,6 @@ namespace FixDiEm
                     int currentValue = int.Parse(listView_Issue.Items[indexlistview].SubItems[1].Text);
 
                     listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValue + issueList[i].DeviceIndex.Count).ToString();
-                    if (issueList[i].FolderName == "CrashTop_2")
-                        Console.WriteLine("CrashTop_2 index = " + indexlistview + " currentValue = " + currentValue + " added = " + issueList[i].DeviceIndex.Count);
                 }
             }
         }
@@ -443,7 +463,29 @@ namespace FixDiEm
                     int collectData_Count = issue.Stactrace.Count();
                     for (int i = 0; i < collectData_Count; i++)
                     {
-                        m_dataToShow += (issue.Stactrace[i] + "\r\n");
+                        string crashline = issue.Stactrace[i] + "\r\n";
+                        if (checkBox_showAddress.Checked)
+                        {
+                            m_dataToShow += crashline;
+                        }
+                        else
+                        {
+                            if (crashline.Contains("  pc "))
+                            {
+                                int begin = crashline.IndexOf('p');
+                                int end = Math.Min(crashline.IndexOf('/'), crashline.IndexOf('('));
+                                int leng = end - begin;
+                                if (leng > 0)
+                                {
+                                    m_dataToShow += crashline.Remove(begin, leng);
+                                }
+                                else
+                                    m_dataToShow += crashline;
+                            }
+                            else
+                                m_dataToShow += crashline;
+
+                        }
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                         {
                             m_dataToShow += ((collectData_Count - i - 1) + " more lines....\r\n");
@@ -513,13 +555,18 @@ namespace FixDiEm
 
         private void btn_Save_Click(object sender, EventArgs e)
         {
-            string json = JsonConvert.SerializeObject(m_analyzeData);
-            File.WriteAllText("TestSave.json", json);
+            m_analyzeData.SaveDataToFile("Save_m_CrashDataRaw.json");
         }
 
         private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
 
+        }
+
+        private void btn_Load_Click(object sender, EventArgs e)
+        {
+            m_analyzeData.LoadDataFromFile("Save_m_CrashDataRaw.json");
+            ShowData_Issue_ByGoogle();
         }
     }
 }

@@ -42,15 +42,27 @@ namespace FixDiEm
                 return m_ID;
             }
         }
-        public ref List<int> DeviceIndex
+        // tmp remove this, cause cannot save json
+        //public ref List<int> DeviceIndexRef
+        //{
+        //    //set
+        //    //{
+        //    //    m_DeviceIndex = value;
+        //    //}
+        //    get
+        //    {
+        //        return ref m_DeviceIndex;
+        //    }
+        //}
+        public List<int> DeviceIndex
         {
-            //set
-            //{
-            //    m_DeviceIndex = value;
-            //}
+            set
+            {
+                m_DeviceIndex = value;
+            }
             get
             {
-                return ref m_DeviceIndex;
+                return m_DeviceIndex;
             }
         }
         public string AddressList

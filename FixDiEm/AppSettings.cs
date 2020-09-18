@@ -12,11 +12,11 @@ namespace FixDiEm
     {
         private struct appSetting
         {
-            public string m_ArmSoPath;
-            public string m_Arm64SoPath;
-            public string m_X86SoPath;
-            public string m_X86_64SoPath;
-            public string m_CrashLogsPath;
+            public string ArmSoPath;
+            public string Arm64SoPath;
+            public string X86SoPath;
+            public string X86_64SoPath;
+            public string CrashLogsPath;
         }
 
         private appSetting m_Settings;// = new appSetting();
@@ -40,55 +40,55 @@ namespace FixDiEm
         {
             set
             {
-                m_Settings.m_ArmSoPath = value;
+                m_Settings.ArmSoPath = value;
             }
             get
             {
-                return m_Settings.m_ArmSoPath;
+                return m_Settings.ArmSoPath;
             }
         }
         public string Arm64SoPath
         {
             set
             {
-                m_Settings.m_Arm64SoPath = value;
+                m_Settings.Arm64SoPath = value;
             }
             get
             {
-                return m_Settings.m_Arm64SoPath;
+                return m_Settings.Arm64SoPath;
             }
         }
         public string X86SoPath
         {
             set
             {
-                m_Settings.m_X86SoPath = value;
+                m_Settings.X86SoPath = value;
             }
             get
             {
-                return m_Settings.m_X86SoPath;
+                return m_Settings.X86SoPath;
             }
         }
         public string X86_64SoPath
         {
             set
             {
-                m_Settings.m_X86_64SoPath = value;
+                m_Settings.X86_64SoPath = value;
             }
             get
             {
-                return m_Settings.m_X86_64SoPath;
+                return m_Settings.X86_64SoPath;
             }
         }
         public string CrashLogPath
         {
             set
             {
-                m_Settings.m_CrashLogsPath = value;
+                m_Settings.CrashLogsPath = value;
             }
             get
             {
-                return m_Settings.m_CrashLogsPath;
+                return m_Settings.CrashLogsPath;
             }
         }
     }

@@ -9,6 +9,7 @@ using System.Threading;
 using System.ComponentModel;
 using System.Data;
 using System.Runtime.Serialization.Formatters;
+using Newtonsoft.Json;
 
 namespace FixDiEm
 {
@@ -92,7 +93,7 @@ namespace FixDiEm
         private List<CrashReport> m_issueList;
         private int m_numTxtFiles = 0;
         private int m_numReportLoaded = 0;
-        private List<Device> m_DevicesList = new List<Device>(); 
+        private List<Device> m_DevicesList; 
 
         public string LogCrashPath
         {
@@ -200,7 +201,7 @@ namespace FixDiEm
                 totalTime += (milliseconds_end - milliseconds_start);
             }
             
-            Console.WriteLine("Time to load " + this.ReportLoaded + " files: " + totalTime);
+            Console.WriteLine("Time to load: {0}, files: {1}", this.ReportLoaded, totalTime);
             return this.ReportLoaded;
         }
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
@@ -234,7 +235,7 @@ namespace FixDiEm
             }
             catch (FormatException)
             {
-                Console.WriteLine("FormatException: value: " + APIlevel + " Path:" + path);
+                Console.WriteLine("FormatException: value: {0} Path: {1}", APIlevel, path);
             }
 
             switch(architecture.Substring(architecture.IndexOf(':') + 2))
@@ -325,10 +326,7 @@ namespace FixDiEm
                         data.IssueID = m_issueList[i].ID;
 
                         m_issueList[i].DeviceIndex.Add(index);
-                        if (Path.GetFileName(Path.GetDirectoryName(path)) == "CrashTop_2")
-                        {
-                            Console.WriteLine("Add device to " + i + "Issue Folder: " + m_issueList[i].FolderName + " Currrent device: " + m_issueList[i].DeviceIndex.Count);
-                        }
+
                         isNewIssue = false;
                         break;
                     }
@@ -344,10 +342,6 @@ namespace FixDiEm
                     issuedata.DeviceIndex.Add(index);
                     m_issueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
-                    if (issuedata.FolderName == "CrashTop_2")
-                    {
-                        Console.WriteLine("Create new issue in folder CrashTop_2 ID = " + issuedata.ID);
-                    }
                 }
             } // end native crash
             else // Java Crash
@@ -361,7 +355,7 @@ namespace FixDiEm
                 }
                 if (backtraceBeginLine == lines.Count())
                 {
-                    Console.WriteLine("Not found backtrace in " + path);
+                    Console.WriteLine("Not found backtrace in: {0}", path);
                     data.IssueID = -1;
                 }
                 else
@@ -469,6 +463,42 @@ namespace FixDiEm
             {
                 return ref m_CrashDataRaw;
             }
+        }
+        public void SaveDataToFile(string path)
+        {
+            string json_part0 = JsonConvert.SerializeObject(m_CrashDataRaw);
+            File.WriteAllText(path + "part0", json_part0);
+
+            string json_part1 = JsonConvert.SerializeObject(m_issueList);
+            File.WriteAllText(path + "part1", json_part1);
+
+            string json_part2 = JsonConvert.SerializeObject(m_DevicesList);
+            File.WriteAllText(path + "part2", json_part2);
+        }
+        public void LoadDataFromFile(string path)
+        {
+            string json_part0 = path + "part0";
+            string json_part1 = path + "part1";
+            string json_part2 = path + "part2";
+
+            if (File.Exists(json_part0))
+            {
+                string json = File.ReadAllText(json_part0);
+                m_CrashDataRaw = JsonConvert.DeserializeObject<CrashData[]>(json);
+            }
+
+            if (File.Exists(json_part1))
+            {
+                string json = File.ReadAllText(json_part1);
+                m_issueList = JsonConvert.DeserializeObject<List<CrashReport>>(json);
+            }
+
+            if (File.Exists(json_part2))
+            {
+                string json = File.ReadAllText(json_part2);
+                m_DevicesList = JsonConvert.DeserializeObject<List<Device>>(json);
+            }
+
         }
 
     }
