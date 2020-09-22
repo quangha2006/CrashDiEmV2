@@ -567,6 +567,7 @@ namespace FixDiEm
         {
             m_analyzeData.LoadDataFromFile("Save_m_CrashDataRaw.json");
             ShowData_Issue_ByGoogle();
+            ShowData_Device();
         }
     }
 }

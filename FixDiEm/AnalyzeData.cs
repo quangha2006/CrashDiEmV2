@@ -485,6 +485,7 @@ namespace FixDiEm
             {
                 string json = File.ReadAllText(json_part0);
                 m_CrashDataRaw = JsonConvert.DeserializeObject<CrashData[]>(json);
+                m_numReportLoaded = m_CrashDataRaw.Count();
             }
 
             if (File.Exists(json_part1))
