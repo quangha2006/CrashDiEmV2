@@ -348,20 +348,8 @@ namespace FixDiEm
                             }
                             else
                             {
-                                if (crashline.Contains("  pc "))
-                                {
-                                    int begin = crashline.IndexOf('p');
-                                    int end = Math.Min(crashline.IndexOf('/'), crashline.IndexOf('('));
-                                    int leng = end - begin;
-                                    if (leng > 0)
-                                    {
-                                        m_dataToShow += crashline.Remove(begin, leng);
-                                    }
-                                    else
-                                        m_dataToShow += crashline;
-                                }
-                                else
-                                    m_dataToShow += crashline;
+
+                                m_dataToShow += RemoveAddressInCrashLine(crashline);
 
                             }
                             if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
@@ -380,6 +368,25 @@ namespace FixDiEm
                 }
             }
             textBox_Resultt.Text = m_dataToShow;
+        }
+        private string RemoveAddressInCrashLine(string input)
+        {
+            string output;
+            if (input.Contains("  pc "))
+            {
+                int begin = input.IndexOf('p');
+                int end = Math.Min(input.IndexOf('/'), input.IndexOf('('));
+                int leng = end - begin;
+                if (leng > 0)
+                {
+                    output = input.Remove(begin, leng);
+                }
+                else
+                    output = input;
+            }
+            else
+                output = input;
+            return output;
         }
         private void ShowData_Device()
         {
@@ -470,20 +477,7 @@ namespace FixDiEm
                         }
                         else
                         {
-                            if (crashline.Contains("  pc "))
-                            {
-                                int begin = crashline.IndexOf('p');
-                                int end = Math.Min(crashline.IndexOf('/'), crashline.IndexOf('('));
-                                int leng = end - begin;
-                                if (leng > 0)
-                                {
-                                    m_dataToShow += crashline.Remove(begin, leng);
-                                }
-                                else
-                                    m_dataToShow += crashline;
-                            }
-                            else
-                                m_dataToShow += crashline;
+                            m_dataToShow += RemoveAddressInCrashLine(crashline);
 
                         }
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
