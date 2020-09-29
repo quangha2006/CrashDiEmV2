@@ -14,16 +14,18 @@ namespace FixDiEm
 {
     public partial class MainForm : Form
     {
+        private string AppTitle = "FixDiEm | quang.haduy@gameloft.com";
+        private string TextConfirmClosing = "Do you really want to exit?";
+        private bool IsSaveSettings = false;
         private AnalyzeData m_analyzeData = new AnalyzeData();
         private AppSettings m_appSettings = new AppSettings();
-        //public delegate void SetUpProgressBarDelegate(int minimum, int maximum, bool enable = true, string customText = null);
-        //public delegate void SortListViewIssueDelegate();
         private string m_dataToShow;
         private ListViewColumnSorter lvDevicesColumnSorter;
         private ListViewColumnSorter lvIssueColumnSorter;
         public MainForm()
         {
             InitializeComponent();
+            this.Text = AppTitle;
             btn_Analyse.Enabled = false;
             progressBar1.Enabled = false;
             progressBar1.VisualMode = TextProgressBar.ProgressBarDisplayMode.NoText;
@@ -60,9 +62,27 @@ namespace FixDiEm
                 textBox_x86_64.Text = m_appSettings.X86_64SoPath;
                 textBox_CrashLogs.Text = m_appSettings.CrashLogPath;
             }
-
+            //Set callback TextChanged
+            textBox_arm.TextChanged += AppSettings_TextChanged;
+            textBox_armV8.TextChanged += AppSettings_TextChanged;
+            textBox_x86.TextChanged += AppSettings_TextChanged;
+            textBox_x86_64.TextChanged += AppSettings_TextChanged;
+            textBox_CrashLogs.TextChanged += AppSettings_TextChanged;
         }
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            DialogResult d = MessageBox.Show(TextConfirmClosing, AppTitle, MessageBoxButtons.YesNo);
+            if (d == DialogResult.No)
+            {
+                e.Cancel = true;
+            }
+            else if (IsSaveSettings)
+            {
+                SaveSettings();
+            }
 
+            base.OnFormClosing(e);
+        }
         private void SaveSettings()
         {
             m_appSettings.ArmSoPath = textBox_arm.Text;
@@ -72,6 +92,17 @@ namespace FixDiEm
             m_appSettings.CrashLogPath = textBox_CrashLogs.Text;
 
             m_appSettings.SaveToFile();
+        }
+        private void AppSettings_TextChanged(object sender, EventArgs e)
+        {
+            IsSaveSettings = true;
+        }
+        private void textBox_CrashLogs_TextChanged(object sender, EventArgs e)
+        {
+            if (textBox_CrashLogs.Text.Length > 0 && Directory.Exists(textBox_CrashLogs.Text))
+                btn_Analyse.Enabled = true;
+            else
+                btn_Analyse.Enabled = false;
         }
         private void label1_Click(object sender, EventArgs e)
         {
@@ -102,7 +133,6 @@ namespace FixDiEm
 
                 fileName = dlg.FileName;
                 textBox_arm.Text = fileName;
-                SaveSettings();
             }
         }
 
@@ -120,7 +150,6 @@ namespace FixDiEm
 
                 fileName = dlg.FileName;
                 textBox_x86.Text = fileName;
-                SaveSettings();
             }
         }
 
@@ -138,7 +167,6 @@ namespace FixDiEm
 
                 fileName = dlg.FileName;
                 textBox_armV8.Text = fileName;
-                SaveSettings();
             }
         }
 
@@ -156,7 +184,6 @@ namespace FixDiEm
 
                 fileName = dlg.FileName;
                 textBox_x86_64.Text = fileName;
-                SaveSettings();
             }
         }
 
@@ -168,7 +195,6 @@ namespace FixDiEm
             {
                 string folderPath = fbd.SelectedPath;
                 textBox_CrashLogs.Text = folderPath;
-                SaveSettings();
             }
         }
 
@@ -232,6 +258,7 @@ namespace FixDiEm
                 ShowData_Issue_ByGoogle();
             else
                 ShowData_Issue_ByAddress();
+
             // Show Data_DeviceList;
             ShowData_Device();
 
@@ -248,7 +275,10 @@ namespace FixDiEm
             progressBar1.Enabled = enable;
             if (customText != null)
             {
-                progressBar1.VisualMode = TextProgressBar.ProgressBarDisplayMode.TextAndCurrProgress;
+                if (minimum == 0 && maximum == 0)
+                    progressBar1.VisualMode = TextProgressBar.ProgressBarDisplayMode.CustomText;
+                else
+                    progressBar1.VisualMode = TextProgressBar.ProgressBarDisplayMode.TextAndCurrProgress;
                 progressBar1.CustomText = customText;
             }
 
@@ -259,13 +289,7 @@ namespace FixDiEm
         {
             progressBar1.Value = value;
         }
-        private void textBox_CrashLogs_TextChanged(object sender, EventArgs e)
-        {
-            if (textBox_CrashLogs.Text.Length > 0 && Directory.Exists(textBox_CrashLogs.Text))
-                btn_Analyse.Enabled = true;
-            else
-                btn_Analyse.Enabled = false;
-        }
+
 
         private void progressBar1_Click(object sender, EventArgs e)
         {
@@ -560,13 +584,20 @@ namespace FixDiEm
 
         private void backgroundWorker_SaveData_DoWork(object sender, DoWorkEventArgs e)
         {
+            this.Invoke((MethodInvoker)delegate
+            {
+                this.Text = AppTitle + " | Saving data.....";
+            });
             string filename = (string)e.Argument;
             m_analyzeData.SaveDataToFile(filename);
         }
 
         private void backgroundWorker_SaveData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-
+            this.Invoke((MethodInvoker)delegate
+            {
+                this.Text += "Complete!";
+            });
         }
 
         private void btn_Load_Click(object sender, EventArgs e)
@@ -580,11 +611,20 @@ namespace FixDiEm
 
             if (dlg.ShowDialog() == DialogResult.OK)
             {
-
+                SetUpProgressBar(0, 0, true, "Loading Data....");
                 m_analyzeData.LoadDataFromFile(dlg.FileName);
 
                 ShowData_Issue_ByGoogle();
                 ShowData_Device();
+
+                //Sort
+                lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
+                lvIssueColumnSorter.Order = SortOrder.Descending;
+                listView_Issue.Sort();
+
+                lvDevicesColumnSorter.SortColumn = 3;
+                lvDevicesColumnSorter.Order = SortOrder.Descending;
+                listView_Devices.Sort();
 
                 SetUpProgressBar(m_analyzeData.ReportLoaded, m_analyzeData.ReportLoaded, true, "Loaded");
             }

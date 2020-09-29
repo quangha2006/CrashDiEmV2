@@ -541,10 +541,6 @@
             this.checkBox_showAddress.Text = "Show Crash Address";
             this.checkBox_showAddress.UseVisualStyleBackColor = true;
             // 
-            // backgroundWorker_SaveData
-            // 
-            this.backgroundWorker_SaveData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
-            // 
             // progressBar1
             // 
             this.progressBar1.CustomText = "";
