@@ -71,11 +71,11 @@
             this.textBox_Highlight = new System.Windows.Forms.TextBox();
             this.label_Highlight = new System.Windows.Forms.Label();
             this.textBox_Resultt = new System.Windows.Forms.TextBox();
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker_AnalyzeData = new System.ComponentModel.BackgroundWorker();
             this.numericUpDown_MaxLineOfStackToShow = new System.Windows.Forms.NumericUpDown();
             this.label_NumLineStack = new System.Windows.Forms.Label();
             this.checkBox_showAddress = new System.Windows.Forms.CheckBox();
-            this.backgroundWorker_PostData = new System.ComponentModel.BackgroundWorker();
+            this.backgroundWorker_SaveData = new System.ComponentModel.BackgroundWorker();
             this.progressBar1 = new FixDiEm.TextProgressBar();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -541,9 +541,9 @@
             this.checkBox_showAddress.Text = "Show Crash Address";
             this.checkBox_showAddress.UseVisualStyleBackColor = true;
             // 
-            // backgroundWorker_PostData
+            // backgroundWorker_SaveData
             // 
-            this.backgroundWorker_PostData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
+            this.backgroundWorker_SaveData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker2_DoWork);
             // 
             // progressBar1
             // 
@@ -633,7 +633,7 @@
         private System.Windows.Forms.ListView listView4;
         private System.Windows.Forms.CheckBox checkBox_txt;
         private FixDiEm.TextProgressBar progressBar1;
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.ComponentModel.BackgroundWorker backgroundWorker_AnalyzeData;
         private System.Windows.Forms.ColumnHeader columnHeader_Manufacture;
         private System.Windows.Forms.ColumnHeader columnHeader_Name;
         private System.Windows.Forms.ColumnHeader columnHeader_DvCode;
@@ -645,7 +645,7 @@
         private System.Windows.Forms.ColumnHeader column_Issue;
         private System.Windows.Forms.CheckBox checkBox_showAddress;
         private System.Windows.Forms.ColumnHeader columnHeader_index;
-        private System.ComponentModel.BackgroundWorker backgroundWorker_PostData;
+        private System.ComponentModel.BackgroundWorker backgroundWorker_SaveData;
     }
 }
 

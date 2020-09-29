@@ -128,6 +128,10 @@ namespace FixDiEm
         }
         public List<CrashReport> IssuesList
         {
+            set
+            {
+                m_issueList = value;
+            }
             get
             {
                 return m_issueList;
@@ -142,6 +146,10 @@ namespace FixDiEm
         }
         public List<AnalyzeData.Device> DevicesList
         {
+            set
+            {
+                m_DevicesList = value;
+            }
             get
             {
                 return m_DevicesList;
@@ -152,6 +160,24 @@ namespace FixDiEm
             get
             {
                 return ref m_DevicesList;
+            }
+        }
+        public ref CrashData[] CrashReportRawRef
+        {
+            get
+            {
+                return ref m_CrashDataRaw;
+            }
+        }
+        public CrashData[] CrashReportRaw
+        {
+            set
+            {
+                m_CrashDataRaw = value;
+            }
+            get
+            {
+                return m_CrashDataRaw;
             }
         }
         private void ClearAndReInitData()
@@ -457,48 +483,39 @@ namespace FixDiEm
             found = false;
             return ref m_CrashDataRaw[0];
         }
-        public ref CrashData[] CrashReportRawRef
+        public class RootObject
         {
-            get
-            {
-                return ref m_CrashDataRaw;
-            }
+            public CrashData[] CrashReportRaw { set; get; }
+            public List<CrashReport> IssuesList { set; get; }
+            public List<Device> DevicesList { set; get; }
         }
         public void SaveDataToFile(string path)
         {
-            string json_part0 = JsonConvert.SerializeObject(m_CrashDataRaw);
-            File.WriteAllText(path + "part0", json_part0);
-
-            string json_part1 = JsonConvert.SerializeObject(m_issueList);
-            File.WriteAllText(path + "part1", json_part1);
-
-            string json_part2 = JsonConvert.SerializeObject(m_DevicesList);
-            File.WriteAllText(path + "part2", json_part2);
+            string json_final = JsonConvert.SerializeObject(new
+            {
+                CrashReportRaw,
+                IssuesList,
+                DevicesList
+            });
+            File.WriteAllText(path, json_final);
         }
         public void LoadDataFromFile(string path)
         {
-            string json_part0 = path + "part0";
-            string json_part1 = path + "part1";
-            string json_part2 = path + "part2";
-
-            if (File.Exists(json_part0))
+            if (File.Exists(path))
             {
-                string json = File.ReadAllText(json_part0);
-                m_CrashDataRaw = JsonConvert.DeserializeObject<CrashData[]>(json);
-                m_numReportLoaded = m_CrashDataRaw.Count();
+                string json = File.ReadAllText(path);
+
+                RootObject data = JsonConvert.DeserializeObject<RootObject>(json);
+
+                CrashReportRaw = data.CrashReportRaw;
+
+                IssuesList = data.IssuesList;
+
+                DevicesList = data.DevicesList;
+
+                ReportLoaded = CrashReportRaw.Count();
             }
 
-            if (File.Exists(json_part1))
-            {
-                string json = File.ReadAllText(json_part1);
-                m_issueList = JsonConvert.DeserializeObject<List<CrashReport>>(json);
-            }
-
-            if (File.Exists(json_part2))
-            {
-                string json = File.ReadAllText(json_part2);
-                m_DevicesList = JsonConvert.DeserializeObject<List<Device>>(json);
-            }
 
         }
 

@@ -27,12 +27,21 @@ namespace FixDiEm
             btn_Analyse.Enabled = false;
             progressBar1.Enabled = false;
             progressBar1.VisualMode = TextProgressBar.ProgressBarDisplayMode.NoText;
-            backgroundWorker1 = new BackgroundWorker();
-            backgroundWorker1.WorkerReportsProgress = true;
-            backgroundWorker1.WorkerSupportsCancellation = true;
-            backgroundWorker1.DoWork += backgroundWorker1_DoWork;
-            backgroundWorker1.ProgressChanged += backgroundWorker1_ProgressChanged;
-            backgroundWorker1.RunWorkerCompleted += backgroundWorker1_RunWorkerCompleted;
+
+            backgroundWorker_AnalyzeData = new BackgroundWorker();
+            backgroundWorker_AnalyzeData.WorkerReportsProgress = true;
+            backgroundWorker_AnalyzeData.WorkerSupportsCancellation = true;
+            backgroundWorker_AnalyzeData.DoWork += backgroundWorker_AnalyzeData_DoWork;
+            backgroundWorker_AnalyzeData.ProgressChanged += backgroundWorker_AnalyzeData_ProgressChanged;
+            backgroundWorker_AnalyzeData.RunWorkerCompleted += backgroundWorker_AnalyzeData_RunWorkerCompleted;
+
+            backgroundWorker_SaveData = new BackgroundWorker();
+            backgroundWorker_SaveData.WorkerReportsProgress = true;
+            backgroundWorker_SaveData.WorkerSupportsCancellation = true;
+            backgroundWorker_SaveData.DoWork += backgroundWorker_SaveData_DoWork;
+            //backgroundWorker_SaveData.ProgressChanged += backgroundWorker_SaveData_ProgressChanged;
+            backgroundWorker_SaveData.RunWorkerCompleted += backgroundWorker_SaveData_RunWorkerCompleted;
+
             numericUpDown_MaxLineOfStackToShow.Value = 20;
 
             lvDevicesColumnSorter = new ListViewColumnSorter();
@@ -153,23 +162,6 @@ namespace FixDiEm
 
         private void btn_Select_crash_logs_Click(object sender, EventArgs e)
         {
-            //    OpenFileDialog dlg = new OpenFileDialog()
-            //    {
-            //        Title = "Select Crash Logs Folder",
-            //        ValidateNames = false,
-            //        CheckFileExists = false,
-            //        CheckPathExists = true,
-            //        FileName = "Folder Selection."
-            //      };
-
-            //    if (dlg.ShowDialog() == DialogResult.OK)
-            //    {
-            //        string folderPath;
-
-            //        folderPath = dlg.FileName;
-            //        textBox_CrashLogs.Text = folderPath;
-            //    }
-
             FolderBrowserDialog fbd = new FolderBrowserDialog();
             fbd.SelectedPath = textBox_CrashLogs.Text;
             if (fbd.ShowDialog() == DialogResult.OK)
@@ -182,22 +174,22 @@ namespace FixDiEm
 
         private void btn_Analyse_Click(object sender, EventArgs e)
         {
-            if (backgroundWorker1.IsBusy)
+            if (backgroundWorker_AnalyzeData.IsBusy)
             {
                 btn_Analyse_ChangeStage(true);
-                backgroundWorker1.CancelAsync();
+                backgroundWorker_AnalyzeData.CancelAsync();
             }
             else
             {
                 btn_Analyse_ChangeStage(false);
-                backgroundWorker1.RunWorkerAsync();
+                backgroundWorker_AnalyzeData.RunWorkerAsync();
             }
             listView_Issue.Items.Clear();
             listView_Devices.Items.Clear();
             listView3.Items.Clear();
             listView4.Items.Clear();
         }
-        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        private void backgroundWorker_AnalyzeData_DoWork(object sender, DoWorkEventArgs e)
         {
             m_analyzeData.LogCrashPath = textBox_CrashLogs.Text;
             int fCount = m_analyzeData.TxtCount;
@@ -210,9 +202,9 @@ namespace FixDiEm
                 AnalyzeData.MySetting setting;
                 setting.ParseDsym = checkBox_parseDsym.Checked;
                 setting.RemoveSOPath = checkBox_RemoveSOPath.Checked;
-                int filesLoaded = m_analyzeData.LoadCrashLogs(backgroundWorker1, setting);
+                int filesLoaded = m_analyzeData.LoadCrashLogs(backgroundWorker_AnalyzeData, setting);
 
-                if (!backgroundWorker1.CancellationPending) // If all files was read, parse it!
+                if (!backgroundWorker_AnalyzeData.CancellationPending) // If all files was read, parse it!
                 {
                     this.Invoke((MethodInvoker)delegate
                     {
@@ -227,12 +219,12 @@ namespace FixDiEm
                 }
             }
         }
-        private void backgroundWorker1_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void backgroundWorker_AnalyzeData_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if (!backgroundWorker1.CancellationPending)
+            if (!backgroundWorker_AnalyzeData.CancellationPending)
                 UpdateProgressBar(e.ProgressPercentage);
         }
-        private void backgroundWorker1_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void backgroundWorker_AnalyzeData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             btn_Analyse_ChangeStage(true);
             // Show Data_Issues;
@@ -549,19 +541,53 @@ namespace FixDiEm
 
         private void btn_Save_Click(object sender, EventArgs e)
         {
-            m_analyzeData.SaveDataToFile("Save_m_CrashDataRaw.json");
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+
+            saveFileDialog1.Filter = "All files (*.*)|*.*";
+            saveFileDialog1.FilterIndex = 1;
+            saveFileDialog1.RestoreDirectory = true;
+
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                string filename = saveFileDialog1.FileName;
+                // Check file name
+                if (!filename.EndsWith(".json"))
+                    filename += ".json";
+
+                backgroundWorker_SaveData.RunWorkerAsync(argument: filename);
+            }
         }
 
-        private void backgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
+        private void backgroundWorker_SaveData_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string filename = (string)e.Argument;
+            m_analyzeData.SaveDataToFile(filename);
+        }
+
+        private void backgroundWorker_SaveData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
         }
 
         private void btn_Load_Click(object sender, EventArgs e)
         {
-            m_analyzeData.LoadDataFromFile("Save_m_CrashDataRaw.json");
-            ShowData_Issue_ByGoogle();
-            ShowData_Device();
+            OpenFileDialog dlg = new OpenFileDialog()
+            {
+                Filter = "All files (*.*)|*.*|Json (*.json)|*.json",
+                Title = "Select json file to load",
+                FilterIndex = 2
+            };
+
+            if (dlg.ShowDialog() == DialogResult.OK)
+            {
+
+                m_analyzeData.LoadDataFromFile(dlg.FileName);
+
+                ShowData_Issue_ByGoogle();
+                ShowData_Device();
+
+                SetUpProgressBar(m_analyzeData.ReportLoaded, m_analyzeData.ReportLoaded, true, "Loaded");
+            }
         }
     }
 }
