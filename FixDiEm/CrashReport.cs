@@ -11,7 +11,7 @@ namespace FixDiEm
         private string m_Name;
         private int m_ID;
         private List<int> m_DeviceIndex;
-        private string m_AddressList;
+        private int m_HashCode;
         private string m_FolderName;
         private string[] m_Stactrace;
 
@@ -65,15 +65,15 @@ namespace FixDiEm
                 return m_DeviceIndex;
             }
         }
-        public string AddressList
+        public int AddressHashCode
         {
             set
             {
-                m_AddressList = value;
+                m_HashCode = value;
             }
             get
             {
-                return m_AddressList;
+                return m_HashCode;
             }
         }
         public string FolderName

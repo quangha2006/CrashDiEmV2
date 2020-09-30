@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -207,6 +208,7 @@ namespace FixDiEm
             }
             else
             {
+                SetUpProgressBar(0, 0, true, "Checking...");
                 btn_Analyse_ChangeStage(false);
                 backgroundWorker_AnalyzeData.RunWorkerAsync();
             }
@@ -364,7 +366,6 @@ namespace FixDiEm
                             }
                             else
                             {
-
                                 m_dataToShow += RemoveAddressInCrashLine(crashline);
 
                             }
@@ -406,6 +407,7 @@ namespace FixDiEm
         }
         private void ShowData_Device()
         {
+            listView_Devices.Items.Clear();
             var devicesList = m_analyzeData.DevicesListRef;
             foreach (var device in devicesList)
             {
@@ -424,24 +426,27 @@ namespace FixDiEm
         }
         private void ShowData_Issue_ByGoogle()
         {
+            listView_Issue.Items.Clear();
             var issueList = m_analyzeData.IssuesListRef;
-            List<string> issueAdded = new List<string>();
 
             for (int i = 0; i < issueList.Count; i++)
             {
-                if (!issueAdded.Contains(issueList[i].FolderName))
+
+                int indexlistview = listView_Issue.Items.IndexOfKey(issueList[i].FolderName);
+
+                if (indexlistview < 0) //Not added to list yet.
                 {
                     var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issueList[i].DeviceIndex.Count.ToString(), issueList[i].FolderName });
+                    item.Name = issueList[i].FolderName; // This is key of Item.
                     listView_Issue.Items.Add(item);
-                    issueAdded.Add(issueList[i].FolderName);
                 }
-                else // Get Index and increase num report 
+                else //Found, increase reportcount
                 {
-                    int indexlistview = issueAdded.IndexOf(issueList[i].FolderName);
-                    int currentValue = int.Parse(listView_Issue.Items[indexlistview].SubItems[1].Text);
+                    int currentValueOfReportCount = int.Parse(listView_Issue.Items[indexlistview].SubItems[1].Text);
 
-                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValue + issueList[i].DeviceIndex.Count).ToString();
+                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValueOfReportCount + issueList[i].DeviceIndex.Count).ToString();
                 }
+
             }
         }
 
@@ -504,7 +509,6 @@ namespace FixDiEm
                     }
 #if DEBUG
                     m_dataToShow += ("ID: " + issue.ID);
-                    //m_dataToShow += ("code: [" + data.IssueID + "]");
 #endif
                     m_dataToShow += ("\r\n==================================================================\r\n");
                 }
@@ -580,14 +584,16 @@ namespace FixDiEm
 
                 backgroundWorker_SaveData.RunWorkerAsync(argument: filename);
             }
+
         }
 
         private void backgroundWorker_SaveData_DoWork(object sender, DoWorkEventArgs e)
         {
             this.Invoke((MethodInvoker)delegate
             {
-                this.Text = AppTitle + " | Saving data.....";
+               this.Text = this.AppTitle + " | Saving data.....";
             });
+
             string filename = (string)e.Argument;
             m_analyzeData.SaveDataToFile(filename);
         }
@@ -596,7 +602,7 @@ namespace FixDiEm
         {
             this.Invoke((MethodInvoker)delegate
             {
-                this.Text += "Complete!";
+                this.Text += $" Completed at {DateTime.Now.ToString()}!";
             });
         }
 
@@ -612,21 +618,25 @@ namespace FixDiEm
             if (dlg.ShowDialog() == DialogResult.OK)
             {
                 SetUpProgressBar(0, 0, true, "Loading Data....");
+
                 m_analyzeData.LoadDataFromFile(dlg.FileName);
 
-                ShowData_Issue_ByGoogle();
-                ShowData_Device();
+                if (m_analyzeData.ReportLoaded > 0)
+                {
+                    ShowData_Issue_ByGoogle();
+                    ShowData_Device();
 
-                //Sort
-                lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
-                lvIssueColumnSorter.Order = SortOrder.Descending;
-                listView_Issue.Sort();
+                    //Sort
+                    lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
+                    lvIssueColumnSorter.Order = SortOrder.Descending;
+                    listView_Issue.Sort();
 
-                lvDevicesColumnSorter.SortColumn = 3;
-                lvDevicesColumnSorter.Order = SortOrder.Descending;
-                listView_Devices.Sort();
+                    lvDevicesColumnSorter.SortColumn = 3;
+                    lvDevicesColumnSorter.Order = SortOrder.Descending;
+                    listView_Devices.Sort();
 
-                SetUpProgressBar(m_analyzeData.ReportLoaded, m_analyzeData.ReportLoaded, true, "Loaded");
+                    SetUpProgressBar(m_analyzeData.ReportLoaded, m_analyzeData.ReportLoaded, true, "Loaded");
+                }
             }
         }
     }

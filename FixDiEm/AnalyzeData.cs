@@ -344,10 +344,11 @@ namespace FixDiEm
                     string[] splitLine = line.Split(' ');
                     addressString += splitLine[5];
                 }
+                int hashCode = addressString.GetHashCode();
                 bool isNewIssue = true;
                 for(int i = 0; i < m_issueList.Count(); i++)
                 {
-                    if (m_issueList[i].AddressList == addressString && m_issueList[i].FolderName == folderName)
+                    if (m_issueList[i].AddressHashCode == hashCode && m_issueList[i].FolderName == folderName)
                     {
                         data.IssueID = m_issueList[i].ID;
 
@@ -360,7 +361,7 @@ namespace FixDiEm
                 if (isNewIssue)
                 {
                     CrashReport issuedata = new CrashReport();
-                    issuedata.AddressList = addressString;
+                    issuedata.AddressHashCode = hashCode;
                     issuedata.Stactrace = backtraceData;
                     issuedata.ID = m_issueList.Count();
                     issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
@@ -396,10 +397,11 @@ namespace FixDiEm
                     //Check issue and add to list
                     //Get AddressString
                     string addressString = backtraceData[0] + backtraceData[1] + backtraceData[2] + backtraceData[numlineBacktrace - 1];
+                    int hashCode = addressString.GetHashCode();
                     bool isNewIssue = true;
                     for (int i = 0; i < m_issueList.Count(); i++)
                     {
-                        if (m_issueList[i].AddressList == addressString && m_issueList[i].FolderName == folderName)
+                        if (m_issueList[i].AddressHashCode == hashCode && m_issueList[i].FolderName == folderName)
                         {
                             data.IssueID = m_issueList[i].ID;
 
@@ -413,7 +415,7 @@ namespace FixDiEm
                     {
                         CrashReport issuedata = new CrashReport();
                         issuedata.Name = backtraceData[0];
-                        issuedata.AddressList = addressString;
+                        issuedata.AddressHashCode = hashCode;
                         issuedata.Stactrace = backtraceData;
                         issuedata.ID = m_issueList.Count();
                         issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
@@ -503,6 +505,10 @@ namespace FixDiEm
         {
             if (File.Exists(path))
             {
+                CrashReportRaw = null;
+                IssuesList = null;
+                DevicesList = null;
+
                 string json = File.ReadAllText(path);
 
                 RootObject data = JsonConvert.DeserializeObject<RootObject>(json);
@@ -513,7 +519,18 @@ namespace FixDiEm
 
                 DevicesList = data.DevicesList;
 
-                ReportLoaded = CrashReportRaw.Count();
+                if (CrashReportRaw != null && IssuesList != null && DevicesList != null)
+                {
+                    ReportLoaded = CrashReportRaw.Count();
+                }
+                else
+                {
+                    string message = "Can't load save file!";
+                    string title = "Error!";
+                    MessageBoxButtons buttons = MessageBoxButtons.OK;
+                    MessageBox.Show(message, title, buttons, MessageBoxIcon.Error);
+                }
+                    
             }
 
 
