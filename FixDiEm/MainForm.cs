@@ -31,6 +31,8 @@ namespace FixDiEm
             progressBar1.Enabled = false;
             progressBar1.VisualMode = TextProgressBar.ProgressBarDisplayMode.NoText;
 
+            btn_Save.Enabled = false;
+
             backgroundWorker_AnalyzeData = new BackgroundWorker();
             backgroundWorker_AnalyzeData.WorkerReportsProgress = true;
             backgroundWorker_AnalyzeData.WorkerSupportsCancellation = true;
@@ -232,13 +234,15 @@ namespace FixDiEm
                 setting.RemoveSOPath = checkBox_RemoveSOPath.Checked;
                 int filesLoaded = m_analyzeData.LoadCrashLogs(backgroundWorker_AnalyzeData, setting);
 
+                m_analyzeData.ProcessData();
+
                 if (!backgroundWorker_AnalyzeData.CancellationPending) // If all files was read, parse it!
                 {
                     this.Invoke((MethodInvoker)delegate
                     {
                         SetUpProgressBar(0, fCount, true, "Parsing");
                     });
-                    m_analyzeData.ProcessData();
+                    // Need implement parse Dsym here
 
                     this.Invoke((MethodInvoker)delegate
                     {
@@ -271,6 +275,8 @@ namespace FixDiEm
             lvDevicesColumnSorter.SortColumn = 3;
             lvDevicesColumnSorter.Order = SortOrder.Descending;
             listView_Devices.Sort();
+
+            btn_Save.Enabled = true;
         }
         public void SetUpProgressBar(int minimum, int maximum, bool enable = true, string customText = null)
         {
@@ -341,16 +347,16 @@ namespace FixDiEm
                 }
                 if (isDataFound && shouldAdd)
                 {
-                    m_dataToShow += (data.Path + "\r\n");
-                    m_dataToShow += ("App code: " + data.AppCode + "\r\n");
-                    m_dataToShow += ("Version Code: " + data.VersionCode + "\r\n");
-                    m_dataToShow += ("Date time: " + data.DateTime + "\r\n");
-                    m_dataToShow += ("Device: " + data.DeviceBrand + " " + data.DeviceName + " " + data.DeviceModel + "\r\n");
-                    m_dataToShow += ("Architecture: " + data.GetArchitectureAsString() + "\r\n");
-                    m_dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n");
-                    m_dataToShow += ("backtrace:\r\n");
+                    m_dataToShow += $"Path: {data.Path}\r\n";
+                    m_dataToShow += $"App code: {data.AppCode}\r\n";
+                    m_dataToShow += $"Version Code: {data.VersionCode}\r\n";
+                    m_dataToShow += $"Date time: {data.DateTime}\r\n";
+                    m_dataToShow += $"Device: {data.DeviceBrand} {data.DeviceName} {data.DeviceModel}\r\n";
+                    m_dataToShow += $"Architecture: {data.GetArchitectureAsString()}\r\n";
+                    m_dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
+                    m_dataToShow += $"backtrace:\r\n";
 
-                    m_dataToShow += ("\r\n");
+                    m_dataToShow += "\r\n";
 
                     string[] collectData = m_analyzeData.GetBacktraceByID(data.IssueID);
                     if (collectData != null)
@@ -371,15 +377,14 @@ namespace FixDiEm
                             }
                             if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                             {
-                                m_dataToShow += ((collectData_Count - i - 1)  + " more lines....\r\n");
+                                m_dataToShow += $"{collectData_Count - i - 1} more lines....\r\n";
                                 break;
                             }
                         }
                         issueIDshowed.Add(data.IssueID);
                     }
 #if DEBUG
-                    m_dataToShow += ("ID: " + data.IssueID);
-                    //m_dataToShow += ("code: [" + data.IssueID + "]");
+                    m_dataToShow += $"ID: {data.IssueID}";
 #endif
                     m_dataToShow += ("\r\n==================================================================\r\n");
                 }
@@ -474,14 +479,14 @@ namespace FixDiEm
                     {
                         if (crashreportraw[i].IssueID == issue.ID)
                         {
-                            m_dataToShow += (crashreportraw[i].Path + "\r\n");
-                            m_dataToShow += ("App code: " + crashreportraw[i].AppCode + "\r\n");
-                            m_dataToShow += ("Version Code: " + crashreportraw[i].VersionCode + "\r\n");
-                            m_dataToShow += ("Date time: " + crashreportraw[i].DateTime + "\r\n");
-                            m_dataToShow += ("Device: " + crashreportraw[i].DeviceBrand + " " + crashreportraw[i].DeviceName + " " + crashreportraw[i].DeviceModel + "\r\n");
-                            m_dataToShow += ("Architecture: " + crashreportraw[i].GetArchitectureAsString() + "\r\n");
-                            m_dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n");
-                            m_dataToShow += ("backtrace:\r\n");
+                            m_dataToShow += $"Path: {crashreportraw[i].Path}\r\n";
+                            m_dataToShow += $"App code: {crashreportraw[i].AppCode}\r\n";
+                            m_dataToShow += $"Version Code: {crashreportraw[i].VersionCode}\r\n";
+                            m_dataToShow += $"Date time: {crashreportraw[i].DateTime}\r\n";
+                            m_dataToShow += $"Device: {crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}\r\n";
+                            m_dataToShow += $"Architecture: {crashreportraw[i].GetArchitectureAsString()}\r\n";
+                            m_dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
+                            m_dataToShow += $"backtrace:\r\n";
 
                             m_dataToShow += ("\r\n");
                             break; // Fix late
@@ -508,7 +513,7 @@ namespace FixDiEm
                         }
                     }
 #if DEBUG
-                    m_dataToShow += ("ID: " + issue.ID);
+                    m_dataToShow += $"ID: {issue.ID}";
 #endif
                     m_dataToShow += ("\r\n==================================================================\r\n");
                 }

@@ -212,15 +212,13 @@ namespace FixDiEm
                     string[] lines = contents.Split('\n');
                     if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
                     {
-                        ConvertData(ref lines, file, setting, index);
+                        ConvertData(ref lines, file.Remove(0, m_DataPath.Length), setting, index);
                         index++;
                         backgroundWorker.ReportProgress(index);
                     }
                     if (backgroundWorker.CancellationPending)
                     {
-                        //Need clear data here!
-                        m_CrashDataRaw = null;
-                        return 0;
+                        return this.ReportLoaded;
                     }
                 }
                 long milliseconds_end = DateTimeOffset.Now.ToUnixTimeMilliseconds();
