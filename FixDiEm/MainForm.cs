@@ -396,12 +396,15 @@ namespace FixDiEm
             string output;
             if (input.Contains("  pc "))
             {
+                int input_len = input.Length;
                 int begin = input.IndexOf('p');
-                int end = Math.Min(input.IndexOf('/'), input.IndexOf('('));
-                int leng = end - begin;
-                if (leng > 0)
+                int index_1 = input.IndexOf('/');
+                int index_2 = input.IndexOf('(');
+                int end = Math.Min(index_1 > 0 ? index_1 : input_len, index_2 > 0 ? index_2 : input_len);
+                int len = end - begin;
+                if (len > 0)
                 {
-                    output = input.Remove(begin, leng);
+                    output = input.Remove(begin, len);
                 }
                 else
                     output = input;
