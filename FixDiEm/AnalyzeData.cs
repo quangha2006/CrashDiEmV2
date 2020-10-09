@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Runtime.Serialization.Formatters;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace FixDiEm
 {
@@ -231,12 +232,12 @@ namespace FixDiEm
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
         {
             string type = lines[0];
-            string appcode = lines[2].Substring(lines[2].IndexOf(':') + 2);
+            string appcode = lines[2];
             string Datetime = lines[3];
             string Versioncode = lines[4];
             string Versionname = lines[5];
             string Devicemodel = lines[6];
-            string Devicename = lines[7];
+            string Devicename = lines[7].TrimEnd();
             string Devicebrand = lines[8];
             string APIlevel = lines[9];
             string architecture = lines[10];
@@ -245,8 +246,7 @@ namespace FixDiEm
 
             data.CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash;
 
-            data.AppCode = appcode;
-
+            data.AppCode = appcode.Substring(lines[2].IndexOf(':') + 2);
             data.DateTime = Datetime.Substring(Datetime.IndexOf(':') + 2);
             data.VersionCode = Versioncode.Substring(Versioncode.IndexOf(':') + 2);
             data.VersionName = Versionname.Substring(Versionname.IndexOf(':') + 2);
@@ -337,10 +337,13 @@ namespace FixDiEm
                 //Check issue and add to list
                 //Get AddressString
                 string addressString = "";
+                //Check is the line match with crash address
+                //Regex rgx = new Regex(@"^  #\d|[0-999]  pc $");
                 foreach (string line in backtraceData)
                 {
                     string[] splitLine = line.Split(' ');
-                    addressString += splitLine[5];
+                    if (splitLine.Count() > 6 && splitLine[4].Equals("pc"))
+                        addressString += splitLine[5];
                 }
                 int hashCode = addressString.GetHashCode();
                 bool isNewIssue = true;

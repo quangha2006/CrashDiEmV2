@@ -478,23 +478,23 @@ namespace FixDiEm
             {
                 if (issue.FolderName == issueName)
                 {
+                    string Path = "";
+                    string AppCode;
                     for(int i = 0; i < m_analyzeData.ReportLoaded; i++)
                     {
                         if (crashreportraw[i].IssueID == issue.ID)
                         {
-                            m_dataToShow += $"Path: {crashreportraw[i].Path}\r\n";
+                            Path += $"Path: {crashreportraw[i].Path}\r\n";
                             m_dataToShow += $"App code: {crashreportraw[i].AppCode}\r\n";
                             m_dataToShow += $"Version Code: {crashreportraw[i].VersionCode}\r\n";
                             m_dataToShow += $"Date time: {crashreportraw[i].DateTime}\r\n";
                             m_dataToShow += $"Device: {crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}\r\n";
                             m_dataToShow += $"Architecture: {crashreportraw[i].GetArchitectureAsString()}\r\n";
-                            m_dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
-                            m_dataToShow += $"backtrace:\r\n";
-
-                            m_dataToShow += ("\r\n");
                             break; // Fix late
                         }
                     }
+
+                    m_dataToShow += "*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n";
 
                     int collectData_Count = issue.Stactrace.Count();
                     for (int i = 0; i < collectData_Count; i++)
