@@ -478,23 +478,33 @@ namespace FixDiEm
             {
                 if (issue.FolderName == issueName)
                 {
-                    string Path = "";
-                    string AppCode;
+                    string Path = "Path: ";
+                    string AppCode = "App code: ";
+                    string VersionCode = "Version Code: ";
+                    string DateTime = "Date time: ";
+                    string DeviceName = "Device: ";
+                    string Arch = "Architecture: ";
                     for(int i = 0; i < m_analyzeData.ReportLoaded; i++)
                     {
                         if (crashreportraw[i].IssueID == issue.ID)
                         {
-                            Path += $"Path: {crashreportraw[i].Path}\r\n";
-                            m_dataToShow += $"App code: {crashreportraw[i].AppCode}\r\n";
-                            m_dataToShow += $"Version Code: {crashreportraw[i].VersionCode}\r\n";
-                            m_dataToShow += $"Date time: {crashreportraw[i].DateTime}\r\n";
-                            m_dataToShow += $"Device: {crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}\r\n";
-                            m_dataToShow += $"Architecture: {crashreportraw[i].GetArchitectureAsString()}\r\n";
+                            Path += (Path.Length == 6 ? $"{crashreportraw[i].Path}" : "");
+                            AppCode += $"[{crashreportraw[i].AppCode}]";
+                            VersionCode += $"[{crashreportraw[i].VersionCode}]";
+                            DateTime += $"[{crashreportraw[i].DateTime}]";
+                            DeviceName += $"[{crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}]";
+                            Arch += $"[{crashreportraw[i].GetArchitectureAsString()}]";
                             break; // Fix late
                         }
                     }
 
-                    m_dataToShow += "*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n";
+                    m_dataToShow += (Path + "\r\n");
+                    m_dataToShow += (AppCode + "\r\n");
+                    m_dataToShow += (VersionCode + "\r\n");
+                    m_dataToShow += (DateTime + "\r\n");
+                    m_dataToShow += (DeviceName + "\r\n");
+                    m_dataToShow += (Arch + "\r\n");
+                    m_dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n");
 
                     int collectData_Count = issue.Stactrace.Count();
                     for (int i = 0; i < collectData_Count; i++)

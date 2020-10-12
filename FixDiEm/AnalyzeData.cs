@@ -242,17 +242,19 @@ namespace FixDiEm
             string APIlevel = lines[9];
             string architecture = lines[10];
             string folderName = Path.GetFileName(Path.GetDirectoryName(path));
-            CrashData data = new CrashData(path);
 
-            data.CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash;
+            CrashData data = new CrashData(path)
+            {
+                CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash,
 
-            data.AppCode = appcode.Substring(lines[2].IndexOf(':') + 2);
-            data.DateTime = Datetime.Substring(Datetime.IndexOf(':') + 2);
-            data.VersionCode = Versioncode.Substring(Versioncode.IndexOf(':') + 2);
-            data.VersionName = Versionname.Substring(Versionname.IndexOf(':') + 2);
-            data.DeviceModel = Devicemodel.Substring(Devicemodel.IndexOf(':') + 2);
-            data.DeviceName = Devicename.Substring(Devicename.IndexOf(':') + 2);
-            data.DeviceBrand = Devicebrand.Substring(Devicebrand.IndexOf(':') + 2);
+                AppCode = appcode.Substring(lines[2].IndexOf(':') + 2),
+                DateTime = Datetime.Substring(Datetime.IndexOf(':') + 2),
+                VersionCode = Versioncode.Substring(Versioncode.IndexOf(':') + 2),
+                VersionName = Versionname.Substring(Versionname.IndexOf(':') + 2),
+                DeviceModel = Devicemodel.Substring(Devicemodel.IndexOf(':') + 2),
+                DeviceName = Devicename.IndexOf(':') < Devicename.Length - 1 ? Devicename.Substring(Devicename.IndexOf(':') + 2) : "",
+                DeviceBrand = Devicebrand.Substring(Devicebrand.IndexOf(':') + 2)
+            };
             try
             {
                 data.APILevel = Int32.Parse(APIlevel.Substring(APIlevel.IndexOf(':') + 2));
@@ -361,13 +363,17 @@ namespace FixDiEm
                 }
                 if (isNewIssue)
                 {
-                    CrashReport issuedata = new CrashReport();
-                    issuedata.AddressHashCode = hashCode;
-                    issuedata.Stactrace = backtraceData;
-                    issuedata.ID = m_issueList.Count();
-                    issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
-                    issuedata.Name = issuedata.FolderName;
+                    
+                    CrashReport issuedata = new CrashReport
+                    {
+                        AddressHashCode = hashCode,
+                        Stactrace = backtraceData,
+                        ID = m_issueList.Count(),
+                        FolderName = folderName,
+                        Name = folderName
+                    };
                     issuedata.DeviceIndex.Add(index);
+
                     m_issueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
                 }
@@ -414,13 +420,16 @@ namespace FixDiEm
                     }
                     if (isNewIssue)
                     {
-                        CrashReport issuedata = new CrashReport();
-                        issuedata.Name = backtraceData[0];
-                        issuedata.AddressHashCode = hashCode;
-                        issuedata.Stactrace = backtraceData;
-                        issuedata.ID = m_issueList.Count();
-                        issuedata.FolderName = Path.GetFileName(Path.GetDirectoryName(path));
+                        CrashReport issuedata = new CrashReport
+                        {
+                            Name = backtraceData[0],
+                            AddressHashCode = hashCode,
+                            Stactrace = backtraceData,
+                            ID = m_issueList.Count(),
+                            FolderName = folderName
+                        };
                         issuedata.DeviceIndex.Add(index);
+
                         m_issueList.Add(issuedata);
                         data.IssueID = issuedata.ID;
                     }
