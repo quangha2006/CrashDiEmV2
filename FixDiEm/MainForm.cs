@@ -503,8 +503,10 @@ namespace FixDiEm
                                 DateTime.Add(crashreportraw[i].DateTime);
 
                             string devicename = $"{crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}";
-                            if (!DeviceName.Contains(devicename))
-                                DeviceName.Add(devicename);
+                            if (DeviceName.ContainsKey(devicename))
+                                DeviceName[devicename] += 1;
+                            else
+                                DeviceName.Add(devicename, 1);
 
                             if (!Api.Contains(crashreportraw[i].APILevel))
                                 Api.Add(crashreportraw[i].APILevel);
