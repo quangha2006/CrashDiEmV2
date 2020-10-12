@@ -478,32 +478,49 @@ namespace FixDiEm
             {
                 if (issue.FolderName == issueName)
                 {
-                    string Path = "Path: ";
-                    string AppCode = "App code: ";
-                    string VersionCode = "Version Code: ";
-                    string DateTime = "Date time: ";
-                    string DeviceName = "Device: ";
-                    string Arch = "Architecture: ";
-                    for(int i = 0; i < m_analyzeData.ReportLoaded; i++)
+                    List<string> Path = new List<string>();
+                    List<string> AppCode = new List<string>();
+                    List<string> VersionCode = new List<string>();
+                    List<string> DateTime = new List<string>();
+                    Dictionary<string, int> DeviceName = new Dictionary<string, int>();
+                    List<int> Api = new List<int>();
+                    List<string> Arch = new List<string>();
+
+                    for (int i = 0; i < m_analyzeData.ReportLoaded; i++)
                     {
                         if (crashreportraw[i].IssueID == issue.ID)
                         {
-                            Path += (Path.Length == 6 ? $"{crashreportraw[i].Path}" : "");
-                            AppCode += $"[{crashreportraw[i].AppCode}]";
-                            VersionCode += $"[{crashreportraw[i].VersionCode}]";
-                            DateTime += $"[{crashreportraw[i].DateTime}]";
-                            DeviceName += $"[{crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}]";
-                            Arch += $"[{crashreportraw[i].GetArchitectureAsString()}]";
-                            break; // Fix late
+                            if (Path.Count <= 0)
+                                Path.Add(crashreportraw[i].Path);
+
+                            if (!AppCode.Contains(crashreportraw[i].AppCode))
+                                AppCode.Add(crashreportraw[i].AppCode);
+
+                            if (!VersionCode.Contains(crashreportraw[i].VersionCode))
+                                VersionCode.Add(crashreportraw[i].VersionCode);
+
+                            if (!DateTime.Contains(crashreportraw[i].DateTime))
+                                DateTime.Add(crashreportraw[i].DateTime);
+
+                            string devicename = $"{crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}";
+                            if (!DeviceName.Contains(devicename))
+                                DeviceName.Add(devicename);
+
+                            if (!Api.Contains(crashreportraw[i].APILevel))
+                                Api.Add(crashreportraw[i].APILevel);
+
+                            if (!Arch.Contains(crashreportraw[i].GetArchitectureAsString()))
+                                Arch.Add(crashreportraw[i].GetArchitectureAsString());
                         }
                     }
 
-                    m_dataToShow += (Path + "\r\n");
-                    m_dataToShow += (AppCode + "\r\n");
-                    m_dataToShow += (VersionCode + "\r\n");
-                    m_dataToShow += (DateTime + "\r\n");
-                    m_dataToShow += (DeviceName + "\r\n");
-                    m_dataToShow += (Arch + "\r\n");
+                    m_dataToShow += ("Path: " + string.Join(",",Path.ToArray()) + "\r\n");
+                    m_dataToShow += ("App code: " + string.Join(",", AppCode.ToArray()) + "\r\n");
+                    m_dataToShow += ("Version Code: " + string.Join(",", VersionCode.ToArray()) + "\r\n");
+                    m_dataToShow += ("Date time: " + string.Join(",", DateTime.ToArray()) + "\r\n");
+                    m_dataToShow += ("Device: " + string.Join(",", DeviceName.ToArray()) + "\r\n");
+                    m_dataToShow += ("Api: " + string.Join(",", Api.ToArray()) + "\r\n");
+                    m_dataToShow += ("Architecture: " + string.Join(",", Arch.ToArray()) + "\r\n");
                     m_dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n");
 
                     int collectData_Count = issue.Stactrace.Count();
