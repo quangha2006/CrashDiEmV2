@@ -41,7 +41,7 @@ namespace FixDiEm
             public string Path;
             public CrashType CrashType;
             public string AppCode;
-            public string DateTime;
+            public DateTime DateTime;
             public string VersionCode;
             public string VersionName;
             public string DeviceModel;
@@ -233,7 +233,7 @@ namespace FixDiEm
         {
             string type = lines[0];
             string appcode = lines[2];
-            string Datetime = lines[3];
+            string Datetime = (lines[3].Substring(lines[3].IndexOf(':') + 2)).TrimEnd();
             string Versioncode = lines[4];
             string Versionname = lines[5];
             string Devicemodel = lines[6];
@@ -242,13 +242,21 @@ namespace FixDiEm
             string APIlevel = lines[9];
             string architecture = lines[10];
             string folderName = Path.GetFileName(Path.GetDirectoryName(path));
+            DateTime datetime;
+
+            // Need split string here. OMG
+            if (!DateTime.TryParseExact(Datetime, "dd-MM-yyyy, hh:mm tt", null, System.Globalization.DateTimeStyles.None, out datetime))
+                if (!DateTime.TryParseExact(Datetime, "dd-MM-yyyy, h:mm tt", null, System.Globalization.DateTimeStyles.None, out datetime))
+                    if (!DateTime.TryParseExact(Datetime, "dd-MM-yyyy , h:mm tt", null, System.Globalization.DateTimeStyles.None, out datetime))
+                        if (!DateTime.TryParseExact(Datetime, "dd-MM-yyyy , hh:mm tt", null, System.Globalization.DateTimeStyles.None, out datetime))
+                            Console.WriteLine("Cannot parse date time in file: " + path);
 
             CrashData data = new CrashData(path)
             {
                 CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash,
 
                 AppCode = appcode.Substring(lines[2].IndexOf(':') + 2),
-                DateTime = Datetime.Substring(Datetime.IndexOf(':') + 2),
+                DateTime = datetime,
                 VersionCode = Versioncode.Substring(Versioncode.IndexOf(':') + 2),
                 VersionName = Versionname.Substring(Versionname.IndexOf(':') + 2),
                 DeviceModel = Devicemodel.Substring(Devicemodel.IndexOf(':') + 2),

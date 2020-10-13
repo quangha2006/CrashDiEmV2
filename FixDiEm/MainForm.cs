@@ -481,10 +481,12 @@ namespace FixDiEm
                     List<string> Path = new List<string>();
                     List<string> AppCode = new List<string>();
                     List<string> VersionCode = new List<string>();
-                    List<string> DateTime = new List<string>();
+                    //List<string> DateTime = new List<string>();
                     Dictionary<string, int> DeviceName = new Dictionary<string, int>();
                     List<int> Api = new List<int>();
                     List<string> Arch = new List<string>();
+                    DateTime Timebegin = new DateTime();
+                    DateTime Timeend = new DateTime();
 
                     for (int i = 0; i < m_analyzeData.ReportLoaded; i++)
                     {
@@ -499,8 +501,15 @@ namespace FixDiEm
                             if (!VersionCode.Contains(crashreportraw[i].VersionCode))
                                 VersionCode.Add(crashreportraw[i].VersionCode);
 
-                            if (!DateTime.Contains(crashreportraw[i].DateTime))
-                                DateTime.Add(crashreportraw[i].DateTime);
+                            if (Timebegin == DateTime.MinValue)
+                                Timebegin = crashreportraw[i].DateTime;
+                            else if (crashreportraw[i].DateTime < Timebegin)
+                                Timebegin = crashreportraw[i].DateTime;
+
+                            if (Timeend == DateTime.MinValue)
+                                Timeend = crashreportraw[i].DateTime;
+                            else if (crashreportraw[i].DateTime > Timeend)
+                                Timeend = crashreportraw[i].DateTime;
 
                             string devicename = $"{crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}";
                             if (DeviceName.ContainsKey(devicename))
@@ -519,7 +528,7 @@ namespace FixDiEm
                     m_dataToShow += ("Path: " + string.Join(",",Path.ToArray()) + "\r\n");
                     m_dataToShow += ("App code: " + string.Join(",", AppCode.ToArray()) + "\r\n");
                     m_dataToShow += ("Version Code: " + string.Join(",", VersionCode.ToArray()) + "\r\n");
-                    m_dataToShow += ("Date time: " + string.Join(",", DateTime.ToArray()) + "\r\n");
+                    m_dataToShow += ("Date time: from " + Timebegin.ToString() + " to " + Timeend.ToString() + "\r\n");
                     m_dataToShow += ("Device: " + string.Join(",", DeviceName.ToArray()) + "\r\n");
                     m_dataToShow += ("Api: " + string.Join(",", Api.ToArray()) + "\r\n");
                     m_dataToShow += ("Architecture: " + string.Join(",", Arch.ToArray()) + "\r\n");
