@@ -11,6 +11,7 @@ using System.Data;
 using System.Runtime.Serialization.Formatters;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using System.Collections.Concurrent;
 
 namespace FixDiEm
 {
@@ -21,80 +22,13 @@ namespace FixDiEm
             public bool ParseDsym;
             public bool RemoveSOPath;
         }
-        public enum Architecture
-        {
-            Unknow,
-            armeabi,
-            armeabi_v7a,
-            arm64_v8a,
-            x86,
-            x86_64
-        }
-        public enum CrashType
-        {
-            Native_Crash,
-            JAVA_Crash
-        }
-
-        public struct CrashData
-        {
-            public string Path;
-            public CrashType CrashType;
-            public string AppCode;
-            public DateTime DateTime;
-            public string VersionCode;
-            public string VersionName;
-            public string DeviceModel;
-            public string DeviceName;
-            public string DeviceBrand;
-            public Int32 APILevel;
-            public Architecture architecture;
-            public int IssueID;
-            public CrashData(string path) : this()
-            {
-               Path = path;
-               APILevel = 0;
-               IssueID = -1;
-            }
-            public string GetArchitectureAsString()
-            {
-                switch (this.architecture)
-                {
-                    case Architecture.arm64_v8a:
-                        return "arm64-v8a";
-                    case Architecture.armeabi_v7a:
-                        return "armeabi-v7a";
-                    case Architecture.x86:
-                        return "x86";
-                    case Architecture.x86_64:
-                        return "x86_64";
-                    case Architecture.Unknow:
-                    default:
-                        return "Unknow";
-                }
-            }
-        }
-        public struct Device
-        {
-            public string DeviceBrand;
-            public string DeviceName;
-            public string DeviceModel;
-            public List<int> CrashLogIndex;
-            public Device(string devicebrand, string devicename, string devicemodel)  : this()
-            {
-                this.DeviceBrand = devicebrand;
-                this.DeviceName = devicename;
-                this.DeviceModel = devicemodel;
-                CrashLogIndex = new List<int>();
-            }
-        }
 
         private string m_DataPath;
         private CrashData[] m_CrashDataRaw;
         private List<CrashReport> m_issueList;
         private int m_numTxtFiles = 0;
         private int m_numReportLoaded = 0;
-        private List<Device> m_DevicesList; 
+        private List<Device> m_DevicesList;
 
         public string LogCrashPath
         {
@@ -145,7 +79,7 @@ namespace FixDiEm
                 return ref m_issueList;
             }
         }
-        public List<AnalyzeData.Device> DevicesList
+        public List<Device> DevicesList
         {
             set
             {
@@ -156,7 +90,7 @@ namespace FixDiEm
                 return m_DevicesList;
             }
         }
-        public ref List<AnalyzeData.Device> DevicesListRef
+        public ref List<Device> DevicesListRef
         {
             get
             {
@@ -192,9 +126,11 @@ namespace FixDiEm
             m_issueList = new List<CrashReport>();
             m_DevicesList = new List<Device>();
         }
+        public delegate void ReadFile(string qua);
+
         public int LoadCrashLogs(BackgroundWorker backgroundWorker, MySetting setting)
         {
-            if (this.TxtCount < 0)
+            if (TxtCount < 0)
                 return 0;
 
             ClearAndReInitData();
@@ -203,25 +139,57 @@ namespace FixDiEm
             string[] List_files;
             long totalTime = 0;
 
-            if (Directory.Exists(m_DataPath))
+            if (Directory.Exists(LogCrashPath))
             {
-                List_files = Directory.GetFiles(m_DataPath, "*.txt", SearchOption.AllDirectories);
+                List_files = Directory.GetFiles(LogCrashPath, "*.txt", SearchOption.AllDirectories);
                 long milliseconds_start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+                ConcurrentQueue<string> FileContentRead_Queued = new ConcurrentQueue<string>();
+                string lastfile = List_files.Last();
+
+                Task ReadFile_task = Task.Run(() => 
+                {
+                    foreach (string file in List_files)
+                    {
+                        string contents = File.ReadAllText(file);
+                        FileContentRead_Queued.Enqueue(contents);
+                    }
+                });
+                Task ParseFile_task = Task.Run(() =>
+                {
+                    Console.WriteLine("ParseFile_task");
+                });
+
+                Task.WaitAll(ReadFile_task, ParseFile_task);
+
                 foreach (string file in List_files)
                 {
                     string contents = File.ReadAllText(file);
-                    string[] lines = contents.Split('\n');
-                    if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
+                    FileContentRead_Queued.Enqueue(contents);
+
+                    if (FileContentRead_Queued.Count > 5 || file == lastfile)
                     {
-                        ConvertData(ref lines, file.Remove(0, m_DataPath.Length), setting, index);
-                        index++;
-                        backgroundWorker.ReportProgress(index);
+                        while(FileContentRead_Queued.Count > 0)
+                        {
+                            string enqString; FileContentRead_Queued.TryDequeue(out enqString);
+
+                            string[] lines = enqString.Split('\n');
+
+                            if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
+                            {
+                                ConvertData(ref lines, file.Remove(0, LogCrashPath.Length), setting, index);
+                                index++;
+                                backgroundWorker.ReportProgress(index);
+                            }
+                        }
+                        
                     }
                     if (backgroundWorker.CancellationPending)
                     {
-                        return this.ReportLoaded;
+                        return ReportLoaded;
                     }
                 }
+
                 long milliseconds_end = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 totalTime += (milliseconds_end - milliseconds_start);
             }
@@ -248,7 +216,8 @@ namespace FixDiEm
             //Parse DateTime
             if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out datetime))
                 if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM dd", null, System.Globalization.DateTimeStyles.None, out datetime))
-                    Console.WriteLine("Cannot parse date in file: " + path);
+                    if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM d", null, System.Globalization.DateTimeStyles.None, out datetime))
+                        Console.WriteLine("Cannot parse date in file: " + path);
             
             if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
                 if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "h:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
@@ -315,40 +284,32 @@ namespace FixDiEm
                 for (int i = 0; i < numlineBacktrace; i++)
                 {
                     string currentLine = lines[i + backtraceBeginLine + 1];
-
+                    string finalCurrentLine = currentLine;
                     if (setting.RemoveSOPath) // Clear SO Path
                     {
-                        if (currentLine.Contains("offset"))
+                        // /data/app/com.gameloft.android.ANMP.GloftA9HM-FrOY_R937xKDYVA2yPYfhQ==/lib/arm64/libAsphalt9.so (offset 0x309c000)
+                        if (currentLine.Contains("offset "))
                         {
                             int start = currentLine.IndexOf('/');
                             int end = currentLine.IndexOf(')');
                             int len = end - start + 2;
                             if (end < (currentLine.Length - 1))
                             {
-                                backtraceData[i] = currentLine.Remove(start, len);
+                                finalCurrentLine = currentLine.Remove(start, len);
                             }
-                            else
-                                backtraceData[i] = currentLine;
                         }
-                        else if (currentLine.Contains("libAsphalt9.so"))
+                        else if (currentLine.Contains(" /data/") && currentLine.Contains(".so "))
                         {
                             int start = currentLine.IndexOf('/');
                             int end = currentLine.IndexOf('(');
                             int len = end - start;
                             if (len > 0)
-                                backtraceData[i] = currentLine.Remove(start, len);
-                            else
-                                backtraceData[i] = currentLine;
-                        }
-                        else
-                        {
-                            backtraceData[i] = currentLine;
+                            {
+                                finalCurrentLine = currentLine.Remove(start, len);
+                            }
                         }
                     }
-                    else
-                    {
-                        backtraceData[i] = currentLine;
-                    }
+                    backtraceData[i] = finalCurrentLine;
                 }
                 //Check issue and add to list
                 //Get AddressString

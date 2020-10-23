@@ -63,14 +63,36 @@ namespace FixDiEm
             string stringX = listviewX.SubItems[ColumnToSort].Text;
             string stringY = listviewY.SubItems[ColumnToSort].Text;
 
+            compareResult = ObjectCompare.Compare(stringX, stringY);
+
             int nx;
             int ny;
-            if (int.TryParse(stringX, out nx) && int.TryParse(stringY, out ny))
+
+            try
             {
-                compareResult = nx.CompareTo(ny);
+                if (int.TryParse(stringX, out nx) && int.TryParse(stringY, out ny))
+                {
+                    compareResult = nx.CompareTo(ny);
+                }
+                else
+                {
+                    if (stringX.Contains('_') && stringY.Contains('_'))
+                    {
+                        string[] stringX_split = stringX.Split('_');
+                        string[] stringY_split = stringY.Split('_');
+
+                        if (stringX_split[0] == stringY_split[0])
+                        {
+                            if (int.TryParse(stringX_split[1], out nx) && int.TryParse(stringY_split[1], out ny))
+                                compareResult = nx.CompareTo(ny);
+                        }
+                    }
+                }
             }
-            else
-                compareResult = ObjectCompare.Compare(stringX, stringY);
+            catch (Exception e)
+            {
+                Console.WriteLine("Warning: can't compare {0} vs {1} Ex: {2}", stringX, stringY, e.ToString());
+            }
 
 
             // Compare the two items

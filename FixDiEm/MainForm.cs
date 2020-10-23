@@ -23,6 +23,7 @@ namespace FixDiEm
         private string m_dataToShow;
         private ListViewColumnSorter lvDevicesColumnSorter;
         private ListViewColumnSorter lvIssueColumnSorter;
+
         public MainForm()
         {
             InitializeComponent();
@@ -236,7 +237,7 @@ namespace FixDiEm
 
                 m_analyzeData.ProcessData();
 
-                if (!backgroundWorker_AnalyzeData.CancellationPending) // If all files was read, parse it!
+                if (!backgroundWorker_AnalyzeData.CancellationPending)
                 {
                     this.Invoke((MethodInvoker)delegate
                     {
@@ -270,6 +271,9 @@ namespace FixDiEm
 
             lvIssueColumnSorter.SortColumn = 1;  // Collumn reportCount
             lvIssueColumnSorter.Order = SortOrder.Descending;
+            listView_Issue.Sort();
+            lvIssueColumnSorter.Order = SortOrder.Ascending;
+            lvIssueColumnSorter.SortColumn = 2;
             listView_Issue.Sort();
 
             lvDevicesColumnSorter.SortColumn = 3;
@@ -338,7 +342,7 @@ namespace FixDiEm
             {
                 bool isDataFound = false;
                 bool shouldAdd = true;
-                AnalyzeData.CrashData data = m_analyzeData.GetCrashDataIndex(indexToGet, ref isDataFound);
+                CrashData data = m_analyzeData.GetCrashDataIndex(indexToGet, ref isDataFound);
                 //Check this crash was add to texbox
                 foreach (int id in issueIDshowed)
                 {
@@ -511,7 +515,7 @@ namespace FixDiEm
                             else if (crashreportraw[i].DateTime > Timeend)
                                 Timeend = crashreportraw[i].DateTime;
 
-                            string devicename = $"{crashreportraw[i].DeviceBrand} {crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}";
+                            string devicename = $"{crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}";
                             if (DeviceName.ContainsKey(devicename))
                                 DeviceName[devicename] += 1;
                             else
