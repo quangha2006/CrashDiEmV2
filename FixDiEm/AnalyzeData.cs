@@ -130,71 +130,85 @@ namespace FixDiEm
 
         public int LoadCrashLogs(BackgroundWorker backgroundWorker, MySetting setting)
         {
-            if (TxtCount < 0)
-                return 0;
 
             ClearAndReInitData();
 
+            if (m_CrashDataRaw.Length <= 0)
+                return 0;
+
             int index = 0;
             string[] List_files;
-            long totalTime = 0;
 
-            if (Directory.Exists(LogCrashPath))
+            if (!Directory.Exists(LogCrashPath))
             {
-                List_files = Directory.GetFiles(LogCrashPath, "*.txt", SearchOption.AllDirectories);
-                long milliseconds_start = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-                ConcurrentQueue<string> FileContentRead_Queued = new ConcurrentQueue<string>();
-                string lastfile = List_files.Last();
-
-                Task ReadFile_task = Task.Run(() => 
-                {
-                    foreach (string file in List_files)
-                    {
-                        string contents = File.ReadAllText(file);
-                        FileContentRead_Queued.Enqueue(contents);
-                    }
-                });
-                Task ParseFile_task = Task.Run(() =>
-                {
-                    Console.WriteLine("ParseFile_task");
-                });
-
-                Task.WaitAll(ReadFile_task, ParseFile_task);
-
-                foreach (string file in List_files)
-                {
-                    string contents = File.ReadAllText(file);
-                    FileContentRead_Queued.Enqueue(contents);
-
-                    if (FileContentRead_Queued.Count > 5 || file == lastfile)
-                    {
-                        while(FileContentRead_Queued.Count > 0)
-                        {
-                            string enqString; FileContentRead_Queued.TryDequeue(out enqString);
-
-                            string[] lines = enqString.Split('\n');
-
-                            if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
-                            {
-                                ConvertData(ref lines, file.Remove(0, LogCrashPath.Length), setting, index);
-                                index++;
-                                backgroundWorker.ReportProgress(index);
-                            }
-                        }
-                        
-                    }
-                    if (backgroundWorker.CancellationPending)
-                    {
-                        return ReportLoaded;
-                    }
-                }
-
-                long milliseconds_end = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-                totalTime += (milliseconds_end - milliseconds_start);
+                return 0;
             }
+
+            List_files = Directory.GetFiles(LogCrashPath, "*.txt", SearchOption.AllDirectories);
             
-            Console.WriteLine("Time to load: {0}, files: {1}", this.ReportLoaded, totalTime);
+
+            //ConcurrentQueue<string> FileContentRead_Queued = new ConcurrentQueue<string>();
+            //string lastfile = List_files.Last();
+            long milliseconds_1 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+            //Task ReadFile_task = Task.Run(() => 
+            //{
+            //    foreach (string file in List_files)
+            //    {
+            //        string contents = File.ReadAllText(file);
+            //        FileContentRead_Queued.Enqueue(contents);
+
+            //        if (backgroundWorker.CancellationPending)
+            //        {
+            //            return;
+            //        }
+            //    }
+            //});
+
+            //ReadFile_task.Wait();
+            //while (index < List_files.Length)
+            //{
+            //    string enqString;
+            //    if (FileContentRead_Queued.TryDequeue(out enqString))
+            //    {
+            //        string[] lines = enqString.Split('\n');
+
+            //        if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
+            //        {
+            //            ConvertData(ref lines, List_files[index].Remove(0, LogCrashPath.Length), setting, index);
+
+            //            backgroundWorker.ReportProgress(++index);
+            //        }
+            //    }
+            //    if (backgroundWorker.CancellationPending)
+            //    {
+            //        break;
+            //    }
+            //}
+
+            //ReadFile_task.Wait();
+
+            //Task.WaitAll(ReadFile_task);
+
+            long milliseconds_2 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            foreach (string file in List_files)
+            {
+                string contents = File.ReadAllText(file);
+                string[] lines = contents.Split('\n');
+                if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
+                {
+                    ConvertData(ref lines, file.Remove(0, m_DataPath.Length), setting, index);
+                    backgroundWorker.ReportProgress(++index);
+                }
+                if (backgroundWorker.CancellationPending)
+                {
+                    break;
+                }
+            }
+
+            long milliseconds_3 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            
+            Console.WriteLine("Time to load: {0}, files: {1}", milliseconds_3 - milliseconds_1, this.ReportLoaded);
             return this.ReportLoaded;
         }
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
@@ -338,14 +352,24 @@ namespace FixDiEm
                 }
                 if (isNewIssue)
                 {
-                    
+                    string issueName = backtraceData[0];
+                    foreach(var line in backtraceData)
+                    {
+                        string[] lines_issuename = line.Split(' ');
+                        string lastArray = lines_issuename[lines_issuename.Length - 1];
+                        if (lastArray.StartsWith("(") && lastArray.EndsWith(")"))
+                        {
+                            issueName = lastArray;
+                            break;
+                        }
+                    }
                     CrashReport issuedata = new CrashReport
                     {
                         AddressHashCode = hashCode,
                         Stactrace = backtraceData,
                         ID = m_issueList.Count(),
                         FolderName = folderName,
-                        Name = folderName
+                        Name = issueName
                     };
                     issuedata.DeviceIndex.Add(index);
 
@@ -355,14 +379,9 @@ namespace FixDiEm
             } // end native crash
             else // Java Crash
             {
-                int backtraceBeginLine = 0;
-                foreach (string line in lines) // Can find begin line 10, opt late!
-                {
-                    if (line.Contains("java."))
-                        break;
-                    backtraceBeginLine++;
-                }
-                if (backtraceBeginLine == lines.Count())
+                int backtraceBeginLine = 12;
+
+                if (backtraceBeginLine >= lines.Count())
                 {
                     Console.WriteLine("Not found backtrace in: {0}", path);
                     data.IssueID = -1;

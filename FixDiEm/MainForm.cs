@@ -429,36 +429,31 @@ namespace FixDiEm
         }
         private void ShowData_Issue_ByAddress()
         {
-            var issueList = m_analyzeData.IssuesListRef;
-            for (int i = 0; i < issueList.Count; i++)
+            foreach(var issue in m_analyzeData.IssuesList)
             {
-                var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issueList[i].DeviceIndex.Count().ToString(), issueList[i].Name });
+                var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count().ToString(), issue.FolderName, issue.Name });
                 listView_Issue.Items.Add(item);
             }
         }
         private void ShowData_Issue_ByGoogle()
         {
             listView_Issue.Items.Clear();
-            var issueList = m_analyzeData.IssuesListRef;
 
-            for (int i = 0; i < issueList.Count; i++)
+            foreach(var issue in m_analyzeData.IssuesList)
             {
-
-                int indexlistview = listView_Issue.Items.IndexOfKey(issueList[i].FolderName);
-
+                int indexlistview = listView_Issue.Items.IndexOfKey(issue.FolderName);
                 if (indexlistview < 0) //Not added to list yet.
                 {
-                    var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issueList[i].DeviceIndex.Count.ToString(), issueList[i].FolderName });
-                    item.Name = issueList[i].FolderName; // This is key of Item.
+                    var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count.ToString(), issue.FolderName, issue.Name });
+                    item.Name = issue.FolderName; // This is key of Item.
                     listView_Issue.Items.Add(item);
                 }
                 else //Found, increase reportcount
                 {
                     int currentValueOfReportCount = int.Parse(listView_Issue.Items[indexlistview].SubItems[1].Text);
 
-                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValueOfReportCount + issueList[i].DeviceIndex.Count).ToString();
+                    listView_Issue.Items[indexlistview].SubItems[1].Text = (currentValueOfReportCount + issue.DeviceIndex.Count).ToString();
                 }
-
             }
         }
 
