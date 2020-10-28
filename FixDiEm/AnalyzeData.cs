@@ -146,49 +146,7 @@ namespace FixDiEm
 
             List_files = Directory.GetFiles(LogCrashPath, "*.txt", SearchOption.AllDirectories);
             
-
-            //ConcurrentQueue<string> FileContentRead_Queued = new ConcurrentQueue<string>();
-            //string lastfile = List_files.Last();
             long milliseconds_1 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-
-            //Task ReadFile_task = Task.Run(() => 
-            //{
-            //    foreach (string file in List_files)
-            //    {
-            //        string contents = File.ReadAllText(file);
-            //        FileContentRead_Queued.Enqueue(contents);
-
-            //        if (backgroundWorker.CancellationPending)
-            //        {
-            //            return;
-            //        }
-            //    }
-            //});
-
-            //ReadFile_task.Wait();
-            //while (index < List_files.Length)
-            //{
-            //    string enqString;
-            //    if (FileContentRead_Queued.TryDequeue(out enqString))
-            //    {
-            //        string[] lines = enqString.Split('\n');
-
-            //        if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
-            //        {
-            //            ConvertData(ref lines, List_files[index].Remove(0, LogCrashPath.Length), setting, index);
-
-            //            backgroundWorker.ReportProgress(++index);
-            //        }
-            //    }
-            //    if (backgroundWorker.CancellationPending)
-            //    {
-            //        break;
-            //    }
-            //}
-
-            //ReadFile_task.Wait();
-
-            //Task.WaitAll(ReadFile_task);
 
             long milliseconds_2 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             foreach (string file in List_files)
@@ -208,8 +166,8 @@ namespace FixDiEm
 
             long milliseconds_3 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             
-            Console.WriteLine("Time to load: {0}, files: {1}", milliseconds_3 - milliseconds_1, this.ReportLoaded);
-            return this.ReportLoaded;
+            Console.WriteLine("Time to load: {0}, files: {1}", milliseconds_3 - milliseconds_1, ReportLoaded);
+            return ReportLoaded;
         }
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
         {

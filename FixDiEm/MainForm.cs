@@ -48,6 +48,13 @@ namespace FixDiEm
             //backgroundWorker_SaveData.ProgressChanged += backgroundWorker_SaveData_ProgressChanged;
             backgroundWorker_SaveData.RunWorkerCompleted += backgroundWorker_SaveData_RunWorkerCompleted;
 
+            backgroundWorker_ShowCrashIssue = new BackgroundWorker();
+            //backgroundWorker_ShowCrashIssue.WorkerReportsProgress = true;
+            backgroundWorker_ShowCrashIssue.WorkerSupportsCancellation = true;
+            backgroundWorker_ShowCrashIssue.DoWork += backgroundWorker_ShowCrashIssue_DoWork;
+            //backgroundWorker_ShowCrashIssue.ProgressChanged += backgroundWorker_ShowCrashIssue_ProgressChanged;
+            //backgroundWorker_ShowCrashIssue.RunWorkerCompleted += backgroundWorker_ShowCrashIssue_RunWorkerCompleted;
+
             numericUpDown_MaxLineOfStackToShow.Value = 20;
 
             lvDevicesColumnSorter = new ListViewColumnSorter();
@@ -239,13 +246,13 @@ namespace FixDiEm
 
                 if (!backgroundWorker_AnalyzeData.CancellationPending)
                 {
-                    this.Invoke((MethodInvoker)delegate
+                    Invoke((MethodInvoker)delegate
                     {
                         SetUpProgressBar(0, fCount, true, "Parsing");
                     });
                     // Need implement parse Dsym here
 
-                    this.Invoke((MethodInvoker)delegate
+                    Invoke((MethodInvoker)delegate
                     {
                         SetUpProgressBar(filesLoaded, fCount, true, "Loaded");
                     });
@@ -464,18 +471,34 @@ namespace FixDiEm
             if (listView_Issue.SelectedItems.Count > 0)
             {
                 var item = listView_Issue.SelectedItems[0];
-                string issuename = item.SubItems[2].Text;
-                PostData_IssueList(issuename);
+
+                string folderName = item.SubItems[2].Text;
+
+                backgroundWorker_ShowCrashIssue.RunWorkerAsync(argument: folderName);
+                //PostData_IssueList(issuename);
             }
         }
-        private void PostData_IssueList(string issueName)
+        private void backgroundWorker_ShowCrashIssue_DoWork(object sender, DoWorkEventArgs e)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                textBox_Resultt.Text = "Collecting data!";
+            });
+
+            Invoke((MethodInvoker)delegate
+            {
+                PostData_IssueList(e.Argument.ToString());
+            });
+        }
+        private void PostData_IssueList(string folderName)
         {
             var issueList = m_analyzeData.IssuesListRef;
             var crashreportraw = m_analyzeData.CrashReportRawRef;
             m_dataToShow = "";
+
             foreach(var issue in issueList)
             {
-                if (issue.FolderName == issueName)
+                if (issue.FolderName == folderName)
                 {
                     List<string> Path = new List<string>();
                     List<string> AppCode = new List<string>();
