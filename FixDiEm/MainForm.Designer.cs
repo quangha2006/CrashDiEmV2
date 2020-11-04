@@ -386,8 +386,8 @@
             // 
             // column_CountReport
             // 
-            this.column_CountReport.Text = "Num report";
-            this.column_CountReport.Width = 64;
+            this.column_CountReport.Text = "Count";
+            this.column_CountReport.Width = 46;
             // 
             // column_Issue
             // 
@@ -397,7 +397,7 @@
             // column_Name
             // 
             this.column_Name.Text = "Name";
-            this.column_Name.Width = 184;
+            this.column_Name.Width = 384;
             // 
             // tabPage_Devices
             // 

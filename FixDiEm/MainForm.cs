@@ -17,10 +17,11 @@ namespace FixDiEm
     {
         private string AppTitle = "FixDiEm | quang.haduy@gameloft.com";
         private string TextConfirmClosing = "Do you really want to exit?";
+        private string SaveFileName = "appSetting.json";
         private bool IsSaveSettings = false;
-        private AnalyzeData m_analyzeData = new AnalyzeData();
-        private AppSettings m_appSettings = new AppSettings();
-        private string m_dataToShow;
+        private AnalyzeData analyzeData = new AnalyzeData();
+        private AppSettings appSettings = new AppSettings();
+        private string dataToShow;
         private ListViewColumnSorter lvDevicesColumnSorter;
         private ListViewColumnSorter lvIssueColumnSorter;
 
@@ -65,13 +66,13 @@ namespace FixDiEm
             listView_Issue.ListViewItemSorter = lvIssueColumnSorter;
             listView_Issue.ColumnClick += ListView_Issue_ColumnClick;
             //Load Setting
-            if (m_appSettings.LoadSettings())
+            if (appSettings.LoadSettings(SaveFileName))
             {
-                textBox_arm.Text = m_appSettings.ArmSoPath;
-                textBox_armV8.Text = m_appSettings.Arm64SoPath;
-                textBox_x86.Text = m_appSettings.X86SoPath;
-                textBox_x86_64.Text = m_appSettings.X86_64SoPath;
-                textBox_CrashLogs.Text = m_appSettings.CrashLogPath;
+                textBox_arm.Text = appSettings.ArmSoPath;
+                textBox_armV8.Text = appSettings.Arm64SoPath;
+                textBox_x86.Text = appSettings.X86SoPath;
+                textBox_x86_64.Text = appSettings.X86_64SoPath;
+                textBox_CrashLogs.Text = appSettings.CrashLogPath;
             }
             //Set callback TextChanged
             textBox_arm.TextChanged += AppSettings_TextChanged;
@@ -96,13 +97,13 @@ namespace FixDiEm
         }
         private void SaveSettings()
         {
-            m_appSettings.ArmSoPath = textBox_arm.Text;
-            m_appSettings.Arm64SoPath = textBox_armV8.Text;
-            m_appSettings.X86SoPath = textBox_x86.Text;
-            m_appSettings.X86_64SoPath  = textBox_x86_64.Text;
-            m_appSettings.CrashLogPath = textBox_CrashLogs.Text;
+            appSettings.ArmSoPath = textBox_arm.Text;
+            appSettings.Arm64SoPath = textBox_armV8.Text;
+            appSettings.X86SoPath = textBox_x86.Text;
+            appSettings.X86_64SoPath  = textBox_x86_64.Text;
+            appSettings.CrashLogPath = textBox_CrashLogs.Text;
 
-            m_appSettings.SaveToFile();
+            appSettings.SaveToFile(SaveFileName);
         }
         private void AppSettings_TextChanged(object sender, EventArgs e)
         {
@@ -229,8 +230,8 @@ namespace FixDiEm
         }
         private void backgroundWorker_AnalyzeData_DoWork(object sender, DoWorkEventArgs e)
         {
-            m_analyzeData.LogCrashPath = textBox_CrashLogs.Text;
-            int fCount = m_analyzeData.TxtCount;
+            analyzeData.LogCrashPath = textBox_CrashLogs.Text;
+            int fCount = analyzeData.TxtCount;
             if (fCount > 0)
             {
                 this.Invoke((MethodInvoker)delegate
@@ -240,9 +241,9 @@ namespace FixDiEm
                 AnalyzeData.MySetting setting;
                 setting.ParseDsym = checkBox_parseDsym.Checked;
                 setting.RemoveSOPath = checkBox_RemoveSOPath.Checked;
-                int filesLoaded = m_analyzeData.LoadCrashLogs(backgroundWorker_AnalyzeData, setting);
+                int filesLoaded = analyzeData.LoadCrashLogs(backgroundWorker_AnalyzeData, setting);
 
-                m_analyzeData.ProcessData();
+                analyzeData.ProcessData();
 
                 if (!backgroundWorker_AnalyzeData.CancellationPending)
                 {
@@ -339,17 +340,17 @@ namespace FixDiEm
         }
         private void PostData_DeviceList(int index)
         {
-            var devicesList = m_analyzeData.DevicesListRef;
+            var devicesList = analyzeData.DevicesListRef;
 
             List<int> dataList = devicesList[index].CrashLogIndex;
             //string m_dataToShow;
-            m_dataToShow = "";
+            dataToShow = "";
             List<int> issueIDshowed = new List<int>();
             foreach (int indexToGet in dataList)
             {
                 bool isDataFound = false;
                 bool shouldAdd = true;
-                CrashData data = m_analyzeData.GetCrashDataIndex(indexToGet, ref isDataFound);
+                CrashData data = analyzeData.GetCrashDataIndex(indexToGet, ref isDataFound);
                 //Check this crash was add to texbox
                 foreach (int id in issueIDshowed)
                 {
@@ -358,49 +359,49 @@ namespace FixDiEm
                 }
                 if (isDataFound && shouldAdd)
                 {
-                    m_dataToShow += $"Path: {data.Path}\r\n";
-                    m_dataToShow += $"App code: {data.AppCode}\r\n";
-                    m_dataToShow += $"Version Code: {data.VersionCode}\r\n";
-                    m_dataToShow += $"Date time: {data.DateTime}\r\n";
-                    m_dataToShow += $"Device: {data.DeviceBrand} {data.DeviceName} {data.DeviceModel}\r\n";
-                    m_dataToShow += $"Architecture: {data.GetArchitectureAsString()}\r\n";
-                    m_dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
-                    m_dataToShow += $"backtrace:\r\n";
+                    dataToShow += $"Path: {data.Path}\r\n";
+                    dataToShow += $"App code: {data.AppCode}\r\n";
+                    dataToShow += $"Version Code: {data.VersionCode}\r\n";
+                    dataToShow += $"Date time: {data.DateTime}\r\n";
+                    dataToShow += $"Device: {data.DeviceBrand} {data.DeviceName} {data.DeviceModel}\r\n";
+                    dataToShow += $"Architecture: {data.GetArchitectureAsString()}\r\n";
+                    dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
+                    dataToShow += $"backtrace:\r\n";
 
-                    m_dataToShow += "\r\n";
+                    dataToShow += "\r\n";
 
-                    string[] collectData = m_analyzeData.GetBacktraceByID(data.IssueID);
-                    if (collectData != null)
+                    string[] backTraces = analyzeData.GetBacktraceByID(data.IssueID);
+                    if (backTraces != null)
                     {
-                        //foreach (string line in collectData)
-                        int collectData_Count = collectData.Count();
-                        for (int i = 0; i < collectData_Count; i ++)
+
+                        int lineCount = 0;
+                        foreach(var line in backTraces)
                         {
-                            string crashline = collectData[i] + "\r\n";
                             if (checkBox_showAddress.Checked)
                             {
-                                m_dataToShow += crashline;
+                                dataToShow += $"{line}\r\n";
                             }
                             else
                             {
-                                m_dataToShow += RemoveAddressInCrashLine(crashline);
+                                dataToShow += $"{RemoveAddressInCrashLine(line)}\r\n";
 
                             }
-                            if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
+                            lineCount++;
+                            if (numericUpDown_MaxLineOfStackToShow.Value > 0 && lineCount > numericUpDown_MaxLineOfStackToShow.Value)
                             {
-                                m_dataToShow += $"{collectData_Count - i - 1} more lines....\r\n";
+                                dataToShow += $"{backTraces.Length - lineCount - 1} more lines....\r\n";
                                 break;
                             }
                         }
                         issueIDshowed.Add(data.IssueID);
                     }
 #if DEBUG
-                    m_dataToShow += $"ID: {data.IssueID}";
+                    dataToShow += $"ID: {data.IssueID}";
 #endif
-                    m_dataToShow += ("\r\n==================================================================\r\n");
+                    dataToShow += ("\r\n==================================================================\r\n");
                 }
             }
-            textBox_Resultt.Text = m_dataToShow;
+            textBox_Resultt.Text = dataToShow;
         }
         private string RemoveAddressInCrashLine(string input)
         {
@@ -427,7 +428,7 @@ namespace FixDiEm
         private void ShowData_Device()
         {
             listView_Devices.Items.Clear();
-            var devicesList = m_analyzeData.DevicesListRef;
+            var devicesList = analyzeData.DevicesListRef;
             foreach (var device in devicesList)
             {
                 var item = new ListViewItem(new string[] { device.DeviceBrand, device.DeviceName, device.DeviceModel, device.CrashLogIndex.Count().ToString(), listView_Devices.Items.Count.ToString() });
@@ -436,7 +437,7 @@ namespace FixDiEm
         }
         private void ShowData_Issue_ByAddress()
         {
-            foreach(var issue in m_analyzeData.IssuesList)
+            foreach(var issue in analyzeData.IssuesList)
             {
                 var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count().ToString(), issue.FolderName, issue.Name });
                 listView_Issue.Items.Add(item);
@@ -446,7 +447,7 @@ namespace FixDiEm
         {
             listView_Issue.Items.Clear();
 
-            foreach(var issue in m_analyzeData.IssuesList)
+            foreach(var issue in analyzeData.IssuesList)
             {
                 int indexlistview = listView_Issue.Items.IndexOfKey(issue.FolderName);
                 if (indexlistview < 0) //Not added to list yet.
@@ -492,9 +493,10 @@ namespace FixDiEm
         }
         private void PostData_IssueList(string folderName)
         {
-            var issueList = m_analyzeData.IssuesListRef;
-            var crashreportraw = m_analyzeData.CrashReportRawRef;
-            m_dataToShow = "";
+            var issueList = analyzeData.IssuesListRef;
+            //var crashreportraw = analyzeData.CrashDataRaw;
+            Console.WriteLine(typeof(CrashData).IsValueType);
+            dataToShow = "";
 
             foreach(var issue in issueList)
             {
@@ -510,51 +512,52 @@ namespace FixDiEm
                     DateTime Timebegin = new DateTime();
                     DateTime Timeend = new DateTime();
 
-                    for (int i = 0; i < m_analyzeData.ReportLoaded; i++)
+                    //for (int i = 0; i < analyzeData.ReportLoaded; i++)
+                    foreach(var report in analyzeData.CrashDataRaw)
                     {
-                        if (crashreportraw[i].IssueID == issue.ID)
+                        if (report!= null && report.IssueID == issue.ID)
                         {
                             if (Path.Count <= 0)
-                                Path.Add(crashreportraw[i].Path);
+                                Path.Add(report.Path);
 
-                            if (!AppCode.Contains(crashreportraw[i].AppCode))
-                                AppCode.Add(crashreportraw[i].AppCode);
+                            if (!AppCode.Contains(report.AppCode))
+                                AppCode.Add(report.AppCode);
 
-                            if (!VersionCode.Contains(crashreportraw[i].VersionCode))
-                                VersionCode.Add(crashreportraw[i].VersionCode);
+                            if (!VersionCode.Contains(report.VersionCode))
+                                VersionCode.Add(report.VersionCode);
 
                             if (Timebegin == DateTime.MinValue)
-                                Timebegin = crashreportraw[i].DateTime;
-                            else if (crashreportraw[i].DateTime < Timebegin)
-                                Timebegin = crashreportraw[i].DateTime;
+                                Timebegin = report.DateTime;
+                            else if (report.DateTime < Timebegin)
+                                Timebegin = report.DateTime;
 
                             if (Timeend == DateTime.MinValue)
-                                Timeend = crashreportraw[i].DateTime;
-                            else if (crashreportraw[i].DateTime > Timeend)
-                                Timeend = crashreportraw[i].DateTime;
+                                Timeend = report.DateTime;
+                            else if (report.DateTime > Timeend)
+                                Timeend = report.DateTime;
 
-                            string devicename = $"{crashreportraw[i].DeviceName} {crashreportraw[i].DeviceModel}";
+                            string devicename = $"{report.DeviceName} {report.DeviceModel}";
                             if (DeviceName.ContainsKey(devicename))
                                 DeviceName[devicename] += 1;
                             else
                                 DeviceName.Add(devicename, 1);
 
-                            if (!Api.Contains(crashreportraw[i].APILevel))
-                                Api.Add(crashreportraw[i].APILevel);
+                            if (!Api.Contains(report.APILevel))
+                                Api.Add(report.APILevel);
 
-                            if (!Arch.Contains(crashreportraw[i].GetArchitectureAsString()))
-                                Arch.Add(crashreportraw[i].GetArchitectureAsString());
+                            if (!Arch.Contains(report.GetArchitectureAsString()))
+                                Arch.Add(report.GetArchitectureAsString());
                         }
                     }
 
-                    m_dataToShow += ("Path: " + string.Join(",",Path.ToArray()) + "\r\n");
-                    m_dataToShow += ("App code: " + string.Join(",", AppCode.ToArray()) + "\r\n");
-                    m_dataToShow += ("Version Code: " + string.Join(",", VersionCode.ToArray()) + "\r\n");
-                    m_dataToShow += ("Date time: from " + Timebegin.ToString() + " to " + Timeend.ToString() + "\r\n");
-                    m_dataToShow += ("Device: " + string.Join(",", DeviceName.ToArray()) + "\r\n");
-                    m_dataToShow += ("Api: " + string.Join(",", Api.ToArray()) + "\r\n");
-                    m_dataToShow += ("Architecture: " + string.Join(",", Arch.ToArray()) + "\r\n");
-                    m_dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n");
+                    dataToShow += ("Path: " + string.Join(",",Path.ToArray()) + "\r\n");
+                    dataToShow += ("App code: " + string.Join(",", AppCode.ToArray()) + "\r\n");
+                    dataToShow += ("Version Code: " + string.Join(",", VersionCode.ToArray()) + "\r\n");
+                    dataToShow += ("Date time: from " + Timebegin.ToString() + " to " + Timeend.ToString() + "\r\n");
+                    dataToShow += ("Device: " + string.Join(",", DeviceName.ToArray()) + "\r\n");
+                    dataToShow += ("Api: " + string.Join(",", Api.ToArray()) + "\r\n");
+                    dataToShow += ("Architecture: " + string.Join(",", Arch.ToArray()) + "\r\n");
+                    dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n");
 
                     int collectData_Count = issue.Stactrace.Count();
                     for (int i = 0; i < collectData_Count; i++)
@@ -562,26 +565,26 @@ namespace FixDiEm
                         string crashline = issue.Stactrace[i] + "\r\n";
                         if (checkBox_showAddress.Checked)
                         {
-                            m_dataToShow += crashline;
+                            dataToShow += crashline;
                         }
                         else
                         {
-                            m_dataToShow += RemoveAddressInCrashLine(crashline);
+                            dataToShow += RemoveAddressInCrashLine(crashline);
 
                         }
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                         {
-                            m_dataToShow += ((collectData_Count - i - 1) + " more lines....\r\n");
+                            dataToShow += ((collectData_Count - i - 1) + " more lines....\r\n");
                             break;
                         }
                     }
 #if DEBUG
-                    m_dataToShow += $"ID: {issue.ID}";
+                    dataToShow += $"ID: {issue.ID}";
 #endif
-                    m_dataToShow += ("\r\n==================================================================\r\n");
+                    dataToShow += ("\r\n==================================================================\r\n");
                 }
             }
-            textBox_Resultt.Text = m_dataToShow;
+            textBox_Resultt.Text = dataToShow;
         }
         private void ListView_Devices_ColumnClick(object sender, ColumnClickEventArgs e)
         {
@@ -663,7 +666,7 @@ namespace FixDiEm
             });
 
             string filename = (string)e.Argument;
-            m_analyzeData.SaveDataToFile(filename);
+            analyzeData.SaveDataToFile(filename);
         }
 
         private void backgroundWorker_SaveData_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -687,9 +690,9 @@ namespace FixDiEm
             {
                 SetUpProgressBar(0, 0, true, "Loading Data....");
 
-                m_analyzeData.LoadDataFromFile(dlg.FileName);
+                analyzeData.LoadDataFromFile(dlg.FileName);
 
-                if (m_analyzeData.ReportLoaded > 0)
+                if (analyzeData.ReportLoaded > 0)
                 {
                     ShowData_Issue_ByGoogle();
                     ShowData_Device();
@@ -703,7 +706,7 @@ namespace FixDiEm
                     lvDevicesColumnSorter.Order = SortOrder.Descending;
                     listView_Devices.Sort();
 
-                    SetUpProgressBar(m_analyzeData.ReportLoaded, m_analyzeData.ReportLoaded, true, "Loaded");
+                    SetUpProgressBar(analyzeData.ReportLoaded, analyzeData.ReportLoaded, true, "Loaded");
                 }
             }
         }

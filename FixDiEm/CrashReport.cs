@@ -8,95 +8,16 @@ namespace FixDiEm
 {
     class CrashReport
     {
-        private string m_Name;
-        private int m_ID;
-        private List<int> m_DeviceIndex;
-        private int m_HashCode;
-        private string m_FolderName;
-        private string[] m_Stactrace;
-
         public CrashReport()
         {
-            m_DeviceIndex = new List<int>();
+            DeviceIndex = new List<int>();
         }
 
-        public string Name
-        {
-            set
-            {
-                m_Name = value;
-            }
-            get
-            {
-                return m_Name;
-            }
-        }
-        public int ID
-        {
-            set
-            {
-                m_ID = value;
-            }
-            get
-            {
-                return m_ID;
-            }
-        }
-        // tmp remove this, cause cannot save json
-        //public ref List<int> DeviceIndexRef
-        //{
-        //    //set
-        //    //{
-        //    //    m_DeviceIndex = value;
-        //    //}
-        //    get
-        //    {
-        //        return ref m_DeviceIndex;
-        //    }
-        //}
-        public List<int> DeviceIndex
-        {
-            set
-            {
-                m_DeviceIndex = value;
-            }
-            get
-            {
-                return m_DeviceIndex;
-            }
-        }
-        public int AddressHashCode
-        {
-            set
-            {
-                m_HashCode = value;
-            }
-            get
-            {
-                return m_HashCode;
-            }
-        }
-        public string FolderName
-        {
-            set
-            {
-                m_FolderName = value;
-            }
-            get
-            {
-                return m_FolderName;
-            }
-        }
-        public string[] Stactrace
-        {
-            set
-            {
-                m_Stactrace = value;
-            }
-            get
-            {
-                return m_Stactrace;
-            }
-        }
+        public string Name { set; get; }
+        public int ID { set; get; }
+        public List<int> DeviceIndex { set; get; }
+        public int AddressHashCode { set; get; }
+        public string FolderName { set; get; }
+        public string[] Stactrace { set; get; }
     }
 }

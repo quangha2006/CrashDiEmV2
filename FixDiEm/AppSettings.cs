@@ -10,7 +10,7 @@ namespace FixDiEm
 {
     class AppSettings
     {
-        private struct appSetting
+        private struct AppSetting
         {
             public string ArmSoPath;
             public string Arm64SoPath;
@@ -19,19 +19,19 @@ namespace FixDiEm
             public string CrashLogsPath;
         }
 
-        private appSetting m_Settings;// = new appSetting();
-        public string m_SaveFileName = "appSetting.json";
-        public void SaveToFile()
+        private AppSetting Settings;
+
+        public void SaveToFile(string saveFileName)
         {
-            string json = JsonConvert.SerializeObject(m_Settings);
-            File.WriteAllText(m_SaveFileName, json);
+            string json = JsonConvert.SerializeObject(Settings);
+            File.WriteAllText(saveFileName, json);
         }
-        public bool LoadSettings()
+        public bool LoadSettings(string saveFileName)
         {
-            if (File.Exists(m_SaveFileName))
+            if (File.Exists(saveFileName))
             {
-                string json = File.ReadAllText(m_SaveFileName);
-                m_Settings = JsonConvert.DeserializeObject<appSetting>(json);
+                string json = File.ReadAllText(saveFileName);
+                Settings = JsonConvert.DeserializeObject<AppSetting>(json);
                 return true;
             }
             return false;
@@ -40,55 +40,55 @@ namespace FixDiEm
         {
             set
             {
-                m_Settings.ArmSoPath = value;
+                Settings.ArmSoPath = value;
             }
             get
             {
-                return m_Settings.ArmSoPath;
+                return Settings.ArmSoPath;
             }
         }
         public string Arm64SoPath
         {
             set
             {
-                m_Settings.Arm64SoPath = value;
+                Settings.Arm64SoPath = value;
             }
             get
             {
-                return m_Settings.Arm64SoPath;
+                return Settings.Arm64SoPath;
             }
         }
         public string X86SoPath
         {
             set
             {
-                m_Settings.X86SoPath = value;
+                Settings.X86SoPath = value;
             }
             get
             {
-                return m_Settings.X86SoPath;
+                return Settings.X86SoPath;
             }
         }
         public string X86_64SoPath
         {
             set
             {
-                m_Settings.X86_64SoPath = value;
+                Settings.X86_64SoPath = value;
             }
             get
             {
-                return m_Settings.X86_64SoPath;
+                return Settings.X86_64SoPath;
             }
         }
         public string CrashLogPath
         {
             set
             {
-                m_Settings.CrashLogsPath = value;
+                Settings.CrashLogsPath = value;
             }
             get
             {
-                return m_Settings.CrashLogsPath;
+                return Settings.CrashLogsPath;
             }
         }
     }

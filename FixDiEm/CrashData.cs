@@ -32,7 +32,7 @@ namespace FixDiEm
         public string DeviceModel;
         public string DeviceName;
         public string DeviceBrand;
-        public Int32 APILevel;
+        public int APILevel;
         public Architecture architecture;
         public int IssueID;
         public CrashData(string path)
@@ -43,7 +43,7 @@ namespace FixDiEm
         }
         public string GetArchitectureAsString()
         {
-            switch (this.architecture)
+            switch (architecture)
             {
                 case Architecture.arm64_v8a:
                     return "arm64-v8a";
