@@ -24,9 +24,11 @@ namespace FixDiEm
         }
 
         public CrashData[] CrashDataRaw { set; get; }
-        private List<CrashReport> issueList;
-        private int m_numTxtFiles = 0;
-        private List<Device> m_DevicesList;
+        public int ReportLoaded { private set; get; } = 0;
+        public List<Device> DevicesList { set; get; }
+
+        public List<CrashReport> IssueList { set; get; }
+        private int numTxtFiles = 0;
 
         public string LogCrashPath { set; get; }
 
@@ -34,59 +36,23 @@ namespace FixDiEm
         {
             get
             {
-                if (m_numTxtFiles == 0)
-                    m_numTxtFiles = Directory.GetFiles(LogCrashPath, "*.txt", SearchOption.AllDirectories).Length;
-                return m_numTxtFiles;
+                if (numTxtFiles == 0)
+                    numTxtFiles = Directory.GetFiles(LogCrashPath, "*.txt", SearchOption.AllDirectories).Length;
+                return numTxtFiles;
             }
         }
-        public int ReportLoaded { private set; get; } = 0;
-        public List<CrashReport> IssuesList
-        {
-            set
-            {
-                issueList = value;
-            }
-            get
-            {
-                return issueList;
-            }
-        }
-        public ref List<CrashReport> IssuesListRef
-        {
-            get
-            {
-                return ref issueList;
-            }
-        }
-        public List<Device> DevicesList
-        {
-            set
-            {
-                m_DevicesList = value;
-            }
-            get
-            {
-                return m_DevicesList;
-            }
-        }
-        public ref List<Device> DevicesListRef
-        {
-            get
-            {
-                return ref m_DevicesList;
-            }
-        }
+
 
         private void ClearAndReInitData()
         {
             //Clear Old Data
             ReportLoaded = 0;
             CrashDataRaw = null;
-            m_DevicesList = null;
-            issueList = null;
+            DevicesList = null;
+            IssueList = null;
             CrashDataRaw = new CrashData[this.TxtCount];
-            issueList = new List<CrashReport>();
-            m_DevicesList = new List<Device>();
+            IssueList = new List<CrashReport>();
+            DevicesList = new List<Device>();
         }
         public delegate void ReadFile(string qua);
 
@@ -259,7 +225,7 @@ namespace FixDiEm
                 int hashCode = addressString.GetHashCode();
                 bool isNewIssue = true;
 
-                foreach(var issue in issueList)
+                foreach(var issue in IssueList)
                 {
                     if (issue.AddressHashCode == hashCode && issue.FolderName == folderName)
                     {
@@ -290,13 +256,13 @@ namespace FixDiEm
                     {
                         AddressHashCode = hashCode,
                         Stactrace = backtraceData,
-                        ID = issueList.Count(),
+                        ID = IssueList.Count(),
                         FolderName = folderName,
                         Name = issueName
                     };
                     issuedata.DeviceIndex.Add(index);
 
-                    issueList.Add(issuedata);
+                    IssueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
                 }
             } // end native crash
@@ -324,7 +290,7 @@ namespace FixDiEm
                     int hashCode = addressString.GetHashCode();
                     bool isNewIssue = true;
 
-                    foreach(var issue in issueList)
+                    foreach(var issue in IssueList)
                     {
                         if (issue.AddressHashCode == hashCode && issue.FolderName == folderName)
                         {
@@ -343,12 +309,12 @@ namespace FixDiEm
                             Name = backtraceData[0],
                             AddressHashCode = hashCode,
                             Stactrace = backtraceData,
-                            ID = issueList.Count(),
+                            ID = IssueList.Count(),
                             FolderName = folderName
                         };
                         issuedata.DeviceIndex.Add(index);
 
-                        issueList.Add(issuedata);
+                        IssueList.Add(issuedata);
                         data.IssueID = issuedata.ID;
                     }
                 }
@@ -364,7 +330,7 @@ namespace FixDiEm
             {
                 CrashData data = CrashDataRaw[index];
                 bool isAdded = false;
-                foreach (Device device in m_DevicesList)
+                foreach (Device device in DevicesList)
                 {
                     if (device.DeviceBrand == data.DeviceBrand)
                     {
@@ -383,18 +349,17 @@ namespace FixDiEm
                 {
                     Device device = new Device(data.DeviceBrand, data.DeviceName, data.DeviceModel);
                     device.CrashLogIndex.Add(index);
-                    m_DevicesList.Add(device);
+                    DevicesList.Add(device);
                 }
             }
         }
 
         public string[] GetBacktraceByID(int ID)
         {
-            //Can opt by return index m_issueData[ID].Stactrace
             if (ID == -1)
                 return null;
 
-            foreach (var issue in issueList)
+            foreach (var issue in IssueList)
             {
                 if (issue.ID == ID)
                 {
@@ -424,7 +389,7 @@ namespace FixDiEm
             string json_final = JsonConvert.SerializeObject(new
             {
                 CrashDataRaw,
-                IssuesList,
+                IssueList,
                 DevicesList
             });
             File.WriteAllText(path, json_final);
@@ -434,7 +399,7 @@ namespace FixDiEm
             if (File.Exists(path))
             {
                 CrashDataRaw = null;
-                IssuesList = null;
+                IssueList = null;
                 DevicesList = null;
 
                 string json = File.ReadAllText(path);
@@ -443,11 +408,11 @@ namespace FixDiEm
 
                 CrashDataRaw = data.CrashReportRaw;
 
-                IssuesList = data.IssuesList;
+                IssueList = data.IssuesList;
 
                 DevicesList = data.DevicesList;
 
-                if (CrashDataRaw != null && IssuesList != null && DevicesList != null)
+                if (CrashDataRaw != null && IssueList != null && DevicesList != null)
                 {
                     ReportLoaded = CrashDataRaw.Count();
                 }

@@ -340,7 +340,7 @@ namespace FixDiEm
         }
         private void PostData_DeviceList(int index)
         {
-            var devicesList = analyzeData.DevicesListRef;
+            var devicesList = analyzeData.DevicesList;
 
             List<int> dataList = devicesList[index].CrashLogIndex;
             //string m_dataToShow;
@@ -428,8 +428,8 @@ namespace FixDiEm
         private void ShowData_Device()
         {
             listView_Devices.Items.Clear();
-            var devicesList = analyzeData.DevicesListRef;
-            foreach (var device in devicesList)
+
+            foreach (var device in analyzeData.DevicesList)
             {
                 var item = new ListViewItem(new string[] { device.DeviceBrand, device.DeviceName, device.DeviceModel, device.CrashLogIndex.Count().ToString(), listView_Devices.Items.Count.ToString() });
                 listView_Devices.Items.Add(item);
@@ -437,7 +437,7 @@ namespace FixDiEm
         }
         private void ShowData_Issue_ByAddress()
         {
-            foreach(var issue in analyzeData.IssuesList)
+            foreach(var issue in analyzeData.IssueList)
             {
                 var item = new ListViewItem(new string[] { listView_Issue.Items.Count.ToString(), issue.DeviceIndex.Count().ToString(), issue.FolderName, issue.Name });
                 listView_Issue.Items.Add(item);
@@ -447,7 +447,7 @@ namespace FixDiEm
         {
             listView_Issue.Items.Clear();
 
-            foreach(var issue in analyzeData.IssuesList)
+            foreach(var issue in analyzeData.IssueList)
             {
                 int indexlistview = listView_Issue.Items.IndexOfKey(issue.FolderName);
                 if (indexlistview < 0) //Not added to list yet.
@@ -493,12 +493,10 @@ namespace FixDiEm
         }
         private void PostData_IssueList(string folderName)
         {
-            var issueList = analyzeData.IssuesListRef;
-            //var crashreportraw = analyzeData.CrashDataRaw;
-            Console.WriteLine(typeof(CrashData).IsValueType);
+
             dataToShow = "";
 
-            foreach(var issue in issueList)
+            foreach(var issue in analyzeData.IssueList)
             {
                 if (issue.FolderName == folderName)
                 {
@@ -512,7 +510,6 @@ namespace FixDiEm
                     DateTime Timebegin = new DateTime();
                     DateTime Timeend = new DateTime();
 
-                    //for (int i = 0; i < analyzeData.ReportLoaded; i++)
                     foreach(var report in analyzeData.CrashDataRaw)
                     {
                         if (report!= null && report.IssueID == issue.ID)
