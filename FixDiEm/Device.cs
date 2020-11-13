@@ -14,9 +14,9 @@ namespace FixDiEm
         public List<int> CrashLogIndex;
         public Device(string devicebrand, string devicename, string devicemodel)
         {
-            this.DeviceBrand = devicebrand;
-            this.DeviceName = devicename;
-            this.DeviceModel = devicemodel;
+            DeviceBrand = devicebrand;
+            DeviceName = devicename;
+            DeviceModel = devicemodel;
             CrashLogIndex = new List<int>();
         }
     }

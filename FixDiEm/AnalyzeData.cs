@@ -114,17 +114,26 @@ namespace FixDiEm
             DateTime clocktime;
 
             //Parse DateTime
-            if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out datetime))
-                if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM dd", null, System.Globalization.DateTimeStyles.None, out datetime))
-                    if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM d", null, System.Globalization.DateTimeStyles.None, out datetime))
-                        Console.WriteLine("Cannot parse date in file: " + path);
-            
-            if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
-                if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "h:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
-                    Console.WriteLine("Cannot parse time in file: " + path);
+            if (Datetime.Length > 0)
+            {
+                if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out datetime))
+                    if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM dd", null, System.Globalization.DateTimeStyles.None, out datetime))
+                        if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM d", null, System.Globalization.DateTimeStyles.None, out datetime))
+                            Console.WriteLine("Cannot parse date in file: " + path);
 
-            datetime = datetime.AddHours(clocktime.Hour);
-            datetime = datetime.AddMinutes(clocktime.Minute);
+            }
+            else
+                datetime = new DateTime();
+
+            if (Datetime.Length > 1)
+            {
+                if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
+                    if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "h:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
+                        Console.WriteLine("Cannot parse time in file: " + path);
+
+                datetime = datetime.AddHours(clocktime.Hour);
+                datetime = datetime.AddMinutes(clocktime.Minute);
+            }
 
             CrashData data = new CrashData(path)
             {
