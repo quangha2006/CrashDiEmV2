@@ -366,7 +366,7 @@ namespace FixDiEm
                     dataToShow += $"Device: {data.DeviceBrand} {data.DeviceName} {data.DeviceModel}\r\n";
                     dataToShow += $"Architecture: {data.GetArchitectureAsString()}\r\n";
                     dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
-                    dataToShow += $"backtrace:\r\n";
+                    dataToShow += $"Stacktrace:\r\n";
 
                     dataToShow += "\r\n";
 
@@ -554,7 +554,7 @@ namespace FixDiEm
                     dataToShow += ("Device: " + string.Join(",", DeviceName.ToArray()) + "\r\n");
                     dataToShow += ("Api: " + string.Join(",", Api.ToArray()) + "\r\n");
                     dataToShow += ("Architecture: " + string.Join(",", Arch.ToArray()) + "\r\n");
-                    dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nbacktrace:\r\n\r\n");
+                    dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nStacktrace:\r\n\r\n");
 
                     int collectData_Count = issue.Stactrace.Count();
                     for (int i = 0; i < collectData_Count; i++)

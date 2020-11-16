@@ -180,21 +180,22 @@ namespace FixDiEm
             if (data.CrashType == CrashType.Native_Crash)
             {
                 // Find where is backtrace?
-                int backtraceBeginLine = 0;
+                int backtraceBeginLineIndex = 0;
                 foreach (string line in lines) // Can find begin line 10, opt late!
                 {
-                    if (line == "backtrace:")
+                    if (line == "backtrace:" || line == "Stacktrace:") //Stacktrace is new version
                         break;
-                    backtraceBeginLine++;
+                    backtraceBeginLineIndex++;
                 }
                 // process backtrace:
-                int numlineBacktrace = lines.Count() - backtraceBeginLine - 2;
+                int numlineBacktrace = lines.Count() - backtraceBeginLineIndex - 1;
+
                 string[] backtraceData = new string[numlineBacktrace];
                 for (int i = 0; i < numlineBacktrace; i++)
                 {
-                    string currentLine = lines[i + backtraceBeginLine + 1];
+                    string currentLine = lines[i + backtraceBeginLineIndex + 1];
                     string finalCurrentLine = currentLine;
-                    if (setting.RemoveSOPath) // Clear SO Path
+                    if (currentLine.Length > 0 && setting.RemoveSOPath) // Clear SO Path
                     {
                         // /data/app/com.gameloft.android.ANMP.GloftA9HM-FrOY_R937xKDYVA2yPYfhQ==/lib/arm64/libAsphalt9.so (offset 0x309c000)
                         if (currentLine.Contains("offset "))
@@ -270,9 +271,10 @@ namespace FixDiEm
                         Name = issueName
                     };
                     issuedata.DeviceIndex.Add(index);
-
+                    issuedata.SetStackTraceLines(backtraceData);
                     IssueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
+
                 }
             } // end native crash
             else // Java Crash
