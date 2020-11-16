@@ -34,6 +34,9 @@ namespace FixDiEm
             Stacktracelines = new StackTraceLine[stacktracelines.Count()];
             for(int i = 0; i < stacktracelines.Count(); i++)
             {
+                if (stacktracelines[i].Length <= 0)
+                    continue;
+
                 string[] line = stacktracelines[i].Split(' ');
                 Stacktracelines[i].LineIndex = line[2] + " " + line[4];
                 Stacktracelines[i].CrashAddress = line[5];
