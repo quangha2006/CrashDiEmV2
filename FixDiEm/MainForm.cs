@@ -405,24 +405,19 @@ namespace FixDiEm
         }
         private string RemoveAddressInCrashLine(string input)
         {
-            string output;
+            string output = input;
             if (input.Contains("  pc "))
             {
                 int input_len = input.Length;
-                int begin = input.IndexOf('p');
-                int index_1 = input.IndexOf('/');
-                int index_2 = input.IndexOf('(');
-                int end = Math.Min(index_1 > 0 ? index_1 : input_len, index_2 > 0 ? index_2 : input_len);
-                int len = end - begin;
+                int begin = input.IndexOf('p') + 3;
+                int index_endAddress = input.IndexOf(' ', begin);
+                int len = index_endAddress - begin;
                 if (len > 0)
                 {
-                    output = input.Remove(begin, len);
+                    output = input.Substring(0, begin) + input.Substring(index_endAddress).TrimStart();
                 }
-                else
-                    output = input;
+
             }
-            else
-                output = input;
             return output;
         }
         private void ShowData_Device()

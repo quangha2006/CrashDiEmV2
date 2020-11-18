@@ -29,6 +29,7 @@ namespace FixDiEm
         {
             DeviceIndex = new List<int>();
         }
+
         public void SetStackTraceLines(string[] stacktracelines)
         {
             Stacktracelines = new StackTraceLine[stacktracelines.Count()];
@@ -38,7 +39,7 @@ namespace FixDiEm
                     continue;
 
                 string[] line = stacktracelines[i].Split(' ');
-                Stacktracelines[i].LineIndex = line[2] + " " + line[4];
+                Stacktracelines[i].LineIndex = $"{line[2]} {line[4]}";
                 Stacktracelines[i].CrashAddress = line[5];
 
                 if (line.Length > 7 && line[7].Contains(".so"))

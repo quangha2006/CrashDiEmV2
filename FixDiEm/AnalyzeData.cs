@@ -99,6 +99,25 @@ namespace FixDiEm
         }
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
         {
+            //Regex
+            var expression = new Regex(
+                @"(?<crashtype>[^\r\n])" +
+                @"\r\n" +
+                @"App Code: (?<appcode>[^\r\n])" +
+                @"Date time: (?<datetime>[^\r\n])" +
+                @"Version code: (?<versioncode>[^\r\n])" +
+                @"Version name: (?<versionname>[^\r\n])" +
+                @"Device model: (?<devicemodel>[^\r\n])" +
+                @"Device name: (?<devicename>[^\r\n])" +
+                @"Device brand: (?<devicebrand>[^\r\n])" +
+                @"API level: (?<apilevel>[^\r\n])" +
+                @"Architecture: (?<architecture>[^\r\n])" + 
+                @"\r\n" + 
+                @"(?<crashlines>[^])");
+
+
+
+
             string type = lines[0];
             string appcode = lines[2];
             string[] Datetime = (lines[3].Substring(lines[3].IndexOf(':') + 2)).TrimEnd().Split(',');
