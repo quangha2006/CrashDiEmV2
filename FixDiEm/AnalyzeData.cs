@@ -76,7 +76,6 @@ namespace FixDiEm
             
             long milliseconds_1 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
-            long milliseconds_2 = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             foreach (string file in List_files)
             {
                 string contents = File.ReadAllText(file);
@@ -99,87 +98,66 @@ namespace FixDiEm
         }
         private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
         {
-            //Regex
-            var expression = new Regex(
-                @"(?<crashtype>[^\r\n])" +
-                @"\r\n" +
-                @"App Code: (?<appcode>[^\r\n])" +
-                @"Date time: (?<datetime>[^\r\n])" +
-                @"Version code: (?<versioncode>[^\r\n])" +
-                @"Version name: (?<versionname>[^\r\n])" +
-                @"Device model: (?<devicemodel>[^\r\n])" +
-                @"Device name: (?<devicename>[^\r\n])" +
-                @"Device brand: (?<devicebrand>[^\r\n])" +
-                @"API level: (?<apilevel>[^\r\n])" +
-                @"Architecture: (?<architecture>[^\r\n])" + 
-                @"\r\n" + 
-                @"(?<crashlines>[^])");
+            var type        = lines[0];
+            var appcode     = lines[2].Split(':')[1].Trim();
+            var Datetime    = lines[3].Substring(lines[3].IndexOf(':') + 2).Trim().Split(',');
+            var Versioncode = lines[4].Split(':')[1].Trim();
+            var Versionname = lines[5].Split(':')[1].Trim();
+            var Devicemodel = lines[6].Split(':')[1].Trim();
+            var Devicename  = lines[7].Split(':')[1].Trim();
+            var Devicebrand = lines[8].Split(':')[1].Trim();
+            var apilevel    = lines[9].Split(':')[1].Trim();
+            var architec    = lines[10].Split(':')[1].Trim();
+            var folderName  = Path.GetFileName(Path.GetDirectoryName(path));
 
-
-
-
-            string type = lines[0];
-            string appcode = lines[2];
-            string[] Datetime = (lines[3].Substring(lines[3].IndexOf(':') + 2)).TrimEnd().Split(',');
-            string Versioncode = lines[4];
-            string Versionname = lines[5];
-            string Devicemodel = lines[6];
-            string Devicename = lines[7].TrimEnd();
-            string Devicebrand = lines[8];
-            string APIlevel = lines[9];
-            string architecture = lines[10];
-            string folderName = Path.GetFileName(Path.GetDirectoryName(path));
-            DateTime datetime;
-            DateTime clocktime;
+            DateTime datetime = new DateTime();
 
             //Parse DateTime
             if (Datetime.Length > 0)
             {
-                if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out datetime))
-                    if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM dd", null, System.Globalization.DateTimeStyles.None, out datetime))
-                        if (!DateTime.TryParseExact(Datetime[0].TrimEnd(), "MMM d", null, System.Globalization.DateTimeStyles.None, out datetime))
-                            Console.WriteLine("Cannot parse date in file: " + path);
+                string[] regexs = { "dd-MM-yyyy", "MMM dd", "MMM d" };
+                string st_datetime = Datetime[0].Trim();
+                foreach (var regex in regexs)
+                {
+                    if (DateTime.TryParseExact(st_datetime, regex, null, System.Globalization.DateTimeStyles.None, out datetime))
+                        break;
+                }
 
+                if (Datetime.Length > 1)
+                {
+                    string[] regexs2 = { "hh:mm tt", "h:mm tt" };
+                    string st_datetime2 = Datetime[1].Trim();
+
+                    foreach (var regex in regexs2)
+                    {
+                        if (DateTime.TryParseExact(st_datetime2, regex, null, System.Globalization.DateTimeStyles.None, out DateTime clocktime))
+                        {
+                            datetime = datetime.AddHours(clocktime.Hour);
+                            datetime = datetime.AddMinutes(clocktime.Minute);
+                            break;
+                        }
+                    }
+                }
             }
-            else
-                datetime = new DateTime();
 
-            if (Datetime.Length > 1)
-            {
-                if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "hh:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
-                    if (!DateTime.TryParseExact(Datetime[1].TrimStart(), "h:mm tt", null, System.Globalization.DateTimeStyles.None, out clocktime))
-                        Console.WriteLine("Cannot parse time in file: " + path);
-
-                datetime = datetime.AddHours(clocktime.Hour);
-                datetime = datetime.AddMinutes(clocktime.Minute);
-            }
+            int.TryParse(apilevel, out int APIlevel);
 
             CrashData data = new CrashData(path)
             {
                 CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash,
 
-                AppCode = appcode.Substring(lines[2].IndexOf(':') + 2),
+                AppCode = appcode,
                 DateTime = datetime,
-                VersionCode = Versioncode.Substring(Versioncode.IndexOf(':') + 2),
-                VersionName = Versionname.Substring(Versionname.IndexOf(':') + 2),
-                DeviceModel = Devicemodel.Substring(Devicemodel.IndexOf(':') + 2),
-                DeviceName = Devicename.IndexOf(':') < Devicename.Length - 1 ? Devicename.Substring(Devicename.IndexOf(':') + 2) : "",
-                DeviceBrand = Devicebrand.Substring(Devicebrand.IndexOf(':') + 2)
+                VersionCode = Versioncode,
+                VersionName = Versionname,
+                DeviceModel = Devicemodel,
+                DeviceName = Devicename,
+                DeviceBrand = Devicebrand,
+                APILevel = APIlevel
             };
-            try
-            {
-                data.APILevel = Int32.Parse(APIlevel.Substring(APIlevel.IndexOf(':') + 2));
-            }
-            catch (FormatException)
-            {
-                Console.WriteLine("FormatException: value: {0} Path: {1}", APIlevel, path);
-            }
 
-            switch(architecture.Substring(architecture.IndexOf(':') + 2))
+            switch(architec.Trim())
             {
-                case "N/A":
-                    data.architecture = Architecture.Unknow;
-                    break;
                 case "armeabi-v8":
                     data.architecture = Architecture.arm64_v8a;
                     break;
@@ -192,6 +170,7 @@ namespace FixDiEm
                 case "x86_64":
                     data.architecture = Architecture.x86_64;
                     break;
+                case "N/A":
                 default:
                     data.architecture = Architecture.Unknow;
                     break;
