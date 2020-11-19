@@ -73,13 +73,24 @@ namespace FixDiEm
                 textBox_x86.Text = appSettings.X86SoPath;
                 textBox_x86_64.Text = appSettings.X86_64SoPath;
                 textBox_CrashLogs.Text = appSettings.CrashLogPath;
+                checkBox_parseDsym.Checked = appSettings.IsParseDsym;
+                checkBox_GroupIssueByGoogle.Checked = appSettings.IsGroupIssueByGoogle;
+                checkBox_RemoveSOPath.Checked = appSettings.IsRemoveSOPath;
+                checkBox_showAddress.Checked = appSettings.IsShowCrashAddress;
+                numericUpDown_MaxLineOfStackToShow.Value = appSettings.NumLineToShow;
             }
             //Set callback TextChanged
-            textBox_arm.TextChanged += AppSettings_TextChanged;
-            textBox_armV8.TextChanged += AppSettings_TextChanged;
-            textBox_x86.TextChanged += AppSettings_TextChanged;
-            textBox_x86_64.TextChanged += AppSettings_TextChanged;
-            textBox_CrashLogs.TextChanged += AppSettings_TextChanged;
+            textBox_arm.TextChanged += AppSettings_Changed;
+            textBox_armV8.TextChanged += AppSettings_Changed;
+            textBox_x86.TextChanged += AppSettings_Changed;
+            textBox_x86_64.TextChanged += AppSettings_Changed;
+            textBox_CrashLogs.TextChanged += AppSettings_Changed;
+            checkBox_parseDsym.CheckStateChanged += AppSettings_Changed;
+            checkBox_GroupIssueByGoogle.CheckStateChanged += AppSettings_Changed;
+            checkBox_RemoveSOPath.CheckStateChanged += AppSettings_Changed;
+            checkBox_showAddress.CheckStateChanged += AppSettings_Changed;
+            checkBox_showAddress.CheckStateChanged += AppSettings_Changed;
+            numericUpDown_MaxLineOfStackToShow.ValueChanged += AppSettings_Changed;
         }
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
@@ -102,10 +113,15 @@ namespace FixDiEm
             appSettings.X86SoPath = textBox_x86.Text;
             appSettings.X86_64SoPath  = textBox_x86_64.Text;
             appSettings.CrashLogPath = textBox_CrashLogs.Text;
+            appSettings.IsParseDsym = checkBox_parseDsym.Checked;
+            appSettings.IsGroupIssueByGoogle = checkBox_GroupIssueByGoogle.Checked;
+            appSettings.IsRemoveSOPath = checkBox_RemoveSOPath.Checked;
+            appSettings.IsShowCrashAddress = checkBox_showAddress.Checked;
+            appSettings.NumLineToShow = (int)numericUpDown_MaxLineOfStackToShow.Value;
 
             appSettings.SaveToFile(SaveFileName);
         }
-        private void AppSettings_TextChanged(object sender, EventArgs e)
+        private void AppSettings_Changed(object sender, EventArgs e)
         {
             IsSaveSettings = true;
         }
@@ -408,7 +424,6 @@ namespace FixDiEm
             string output = input;
             if (input.Contains("  pc "))
             {
-                int input_len = input.Length;
                 int begin = input.IndexOf('p') + 3;
                 int index_endAddress = input.IndexOf(' ', begin);
                 int len = index_endAddress - begin;

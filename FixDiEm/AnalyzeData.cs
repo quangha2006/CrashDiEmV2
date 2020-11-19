@@ -259,10 +259,28 @@ namespace FixDiEm
 
                     foreach (var line in issuedata.Stacktracelines) // Get issue name
                     {
-                        if (line.Function != "")
+                        if (!String.IsNullOrEmpty(line.Function))
                         {
                             issuedata.Name = line.Function;
                             break;
+                        }
+                    }
+                    if (String.IsNullOrEmpty(issuedata.Name))
+                    {
+                        foreach (var line in issuedata.Stacktracelines) // Get issue name
+                        {
+                            if (!String.IsNullOrEmpty(line.SOPath))
+                            {
+                                if (line.SOPath.Contains(".apk"))
+                                { 
+                                    issuedata.Name = line.SOPath.Substring(line.SOPath.LastIndexOf('/') + 1);
+                                    break;
+                                }else if (line.SOPath.Contains(".so"))
+                                {
+                                    issuedata.Name = line.SOPath.Substring(line.SOPath.LastIndexOf('/') + 1);
+                                    break;
+                                }
+                            }
                         }
                     }
                     IssueList.Add(issuedata);

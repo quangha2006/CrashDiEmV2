@@ -10,6 +10,7 @@ namespace FixDiEm
 {
     class AppSettings
     {
+        //Why I need to create this struct? Because I have no way to make a json without it.
         private struct AppSetting
         {
             public string ArmSoPath;
@@ -17,6 +18,11 @@ namespace FixDiEm
             public string X86SoPath;
             public string X86_64SoPath;
             public string CrashLogsPath;
+            public bool IsRemoveSOPath;
+            public bool IsGroupIssueByGoogle;
+            public bool IsParseDsym;
+            public bool IsShowCrashAddress;
+            public int NumLineToShow;
         }
 
         private AppSetting Settings;
@@ -89,6 +95,61 @@ namespace FixDiEm
             get
             {
                 return Settings.CrashLogsPath;
+            }
+        }
+        public bool IsRemoveSOPath
+        {
+            set
+            {
+                Settings.IsRemoveSOPath = value;
+            }
+            get
+            {
+                return Settings.IsRemoveSOPath;
+            }
+        }
+        public bool IsGroupIssueByGoogle
+        {
+            set
+            {
+                Settings.IsGroupIssueByGoogle = value;
+            }
+            get
+            {
+                return Settings.IsGroupIssueByGoogle;
+            }
+        }
+        public bool IsParseDsym
+        {
+            set
+            {
+                Settings.IsParseDsym = value;
+            }
+            get
+            {
+                return Settings.IsParseDsym;
+            }
+        }
+        public bool IsShowCrashAddress
+        {
+            set
+            {
+                Settings.IsShowCrashAddress = value;
+            }
+            get
+            {
+                return Settings.IsShowCrashAddress;
+            }
+        }
+        public int NumLineToShow
+        {
+            set
+            {
+                Settings.NumLineToShow = value;
+            }
+            get
+            {
+                return Settings.NumLineToShow;
             }
         }
     }

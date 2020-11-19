@@ -541,6 +541,11 @@
             this.numericUpDown_MaxLineOfStackToShow.Name = "numericUpDown_MaxLineOfStackToShow";
             this.numericUpDown_MaxLineOfStackToShow.Size = new System.Drawing.Size(46, 20);
             this.numericUpDown_MaxLineOfStackToShow.TabIndex = 14;
+            this.numericUpDown_MaxLineOfStackToShow.Value = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
             // 
             // label_NumLineStack
             // 

@@ -54,6 +54,12 @@ namespace FixDiEm
 
                         therestofLine = therestofLine.Substring(therestofLine.IndexOf(".so") + 3).Trim();
                     }
+                    else if (lineSplit[7].Contains(".apk"))
+                    {
+                        Stacktracelines[i].SOPath = lineSplit[7];
+
+                        therestofLine = therestofLine.Substring(therestofLine.IndexOf(".apk") + 4).Trim();
+                    }
 
                     string offset = therestofLine.IndexOf("(offset") == 0 ? therestofLine.Substring(0, therestofLine.IndexOf(')') + 1) : "";
                     Stacktracelines[i].Offset = offset;
