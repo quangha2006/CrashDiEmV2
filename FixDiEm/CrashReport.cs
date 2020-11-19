@@ -11,7 +11,7 @@ namespace FixDiEm
         public string LineIndex;
         public string CrashAddress;
         public string SOPath;
-        public string Offset;
+        public string Offset; // Do we need to store it??, maybe not!
         public string Function;
         public string SourceFile;
     }
@@ -35,19 +35,40 @@ namespace FixDiEm
             Stacktracelines = new StackTraceLine[stacktracelines.Count()];
             for(int i = 0; i < stacktracelines.Count(); i++)
             {
-                if (stacktracelines[i].Length <= 0)
+                string line = stacktracelines[i];
+
+                if (line.Length <= 0)
                     continue;
 
-                string[] line = stacktracelines[i].Split(' ');
-                Stacktracelines[i].LineIndex = $"{line[2]} {line[4]}";
-                Stacktracelines[i].CrashAddress = line[5];
+                string[] lineSplit = line.Split(' ');
+                Stacktracelines[i].LineIndex = $"{lineSplit[2]} {lineSplit[4]}";
+                Stacktracelines[i].CrashAddress = lineSplit[5];
 
-                if (line.Length > 7 && line[7].Contains(".so"))
+                if (lineSplit.Length > 7)
                 {
-                    Stacktracelines[i].SOPath = line[7];
-                    Console.WriteLine(Stacktracelines[i].SOPath);
-                }
+                    string therestofLine = line.Substring(line.IndexOf(Stacktracelines[i].CrashAddress)+ Stacktracelines[i].CrashAddress.Length).TrimStart();
 
+                    if (lineSplit[7].Contains(".so")) // Need implement with .apk
+                    {
+                        Stacktracelines[i].SOPath = lineSplit[7];
+
+                        therestofLine = therestofLine.Substring(therestofLine.IndexOf(".so") + 3).Trim();
+                    }
+
+                    string offset = therestofLine.IndexOf("(offset") == 0 ? therestofLine.Substring(0, therestofLine.IndexOf(')') + 1) : "";
+                    Stacktracelines[i].Offset = offset;
+
+                    if (offset.Length > 0)
+                        therestofLine = therestofLine.Remove(0, offset.Length).TrimStart();
+
+                    if (therestofLine.Contains("(SourceCode:"))
+                    {
+                        var indexSource = therestofLine.IndexOf("(SourceCode:");
+                        Stacktracelines[i].SourceFile = therestofLine.Substring(indexSource);
+                        therestofLine = therestofLine.Remove(indexSource).Trim();
+                    }
+                    Stacktracelines[i].Function = therestofLine;
+                }
             }
         }
     }

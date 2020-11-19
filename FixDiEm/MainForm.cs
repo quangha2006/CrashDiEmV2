@@ -362,7 +362,7 @@ namespace FixDiEm
                     dataToShow += $"Path: {data.Path}\r\n";
                     dataToShow += $"App code: {data.AppCode}\r\n";
                     dataToShow += $"Version Code: {data.VersionCode}\r\n";
-                    dataToShow += $"Date time: {data.DateTime}\r\n";
+                    dataToShow += $"Date time: {(data.DateTime != DateTime.MinValue ? data.DateTime.ToString() : "")}\r\n";
                     dataToShow += $"Device: {data.DeviceBrand} {data.DeviceName} {data.DeviceModel}\r\n";
                     dataToShow += $"Architecture: {data.GetArchitectureAsString()}\r\n";
                     dataToShow += $"*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\n";
@@ -542,13 +542,17 @@ namespace FixDiEm
                         }
                     }
 
-                    dataToShow += ("Path: " + string.Join(",",Path.ToArray()) + "\r\n");
-                    dataToShow += ("App code: " + string.Join(",", AppCode.ToArray()) + "\r\n");
-                    dataToShow += ("Version Code: " + string.Join(",", VersionCode.ToArray()) + "\r\n");
-                    dataToShow += ("Date time: from " + Timebegin.ToString() + " to " + Timeend.ToString() + "\r\n");
-                    dataToShow += ("Device: " + string.Join(",", DeviceName.ToArray()) + "\r\n");
-                    dataToShow += ("Api: " + string.Join(",", Api.ToArray()) + "\r\n");
-                    dataToShow += ("Architecture: " + string.Join(",", Arch.ToArray()) + "\r\n");
+                    string stdatetimebegin = Timebegin != DateTime.MinValue ? Timebegin.ToString() : "";
+                    string stdatetimeend = Timeend != DateTime.MinValue ? Timeend.ToString() : "";
+                    string stdatefinal = stdatetimebegin + (stdatetimebegin != "" && stdatetimeend != "" ? " to " : "") + stdatetimeend;
+
+                    dataToShow += ($"Path: {string.Join(",", Path.ToArray())}\r\n");
+                    dataToShow += ($"App code: {string.Join(",", AppCode.ToArray())}\r\n");
+                    dataToShow += ($"Version Code: {string.Join(",", VersionCode.ToArray())}\r\n");
+                    dataToShow += ($"Date time: {stdatefinal}\r\n");
+                    dataToShow += ($"Device: {string.Join(",", DeviceName.ToArray())}\r\n");
+                    dataToShow += ($"Api: {string.Join(",", Api.ToArray())}\r\n");
+                    dataToShow += ($"Architecture: {string.Join(",", Arch.ToArray())}\r\n");
                     dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nStacktrace:\r\n\r\n");
 
                     int collectData_Count = issue.Stactrace.Count();
@@ -566,7 +570,7 @@ namespace FixDiEm
                         }
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                         {
-                            dataToShow += ((collectData_Count - i - 1) + " more lines....\r\n");
+                            dataToShow += $"{collectData_Count - i - 1} more lines....\r\n";
                             break;
                         }
                     }

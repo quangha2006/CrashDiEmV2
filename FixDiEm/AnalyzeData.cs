@@ -101,16 +101,16 @@ namespace FixDiEm
             var type        = lines[0];
             var appcode     = lines[2].Split(':')[1].Trim();
             var Datetime    = lines[3].Substring(lines[3].IndexOf(':') + 2).Trim().Split(',');
-            var Versioncode = lines[4].Split(':')[1].Trim();
-            var Versionname = lines[5].Split(':')[1].Trim();
-            var Devicemodel = lines[6].Split(':')[1].Trim();
-            var Devicename  = lines[7].Split(':')[1].Trim();
-            var Devicebrand = lines[8].Split(':')[1].Trim();
+            var versioncode = lines[4].Split(':')[1].Trim();
+            var versionname = lines[5].Split(':')[1].Trim();
+            var devicemodel = lines[6].Split(':')[1].Trim();
+            var devicename  = lines[7].Split(':')[1].Trim();
+            var devicebrand = lines[8].Split(':')[1].Trim();
             var apilevel    = lines[9].Split(':')[1].Trim();
             var architec    = lines[10].Split(':')[1].Trim();
             var folderName  = Path.GetFileName(Path.GetDirectoryName(path));
 
-            DateTime datetime = new DateTime();
+            var datetime    = new DateTime();
 
             //Parse DateTime
             if (Datetime.Length > 0)
@@ -148,11 +148,11 @@ namespace FixDiEm
 
                 AppCode = appcode,
                 DateTime = datetime,
-                VersionCode = Versioncode,
-                VersionName = Versionname,
-                DeviceModel = Devicemodel,
-                DeviceName = Devicename,
-                DeviceBrand = Devicebrand,
+                VersionCode = versioncode,
+                VersionName = versionname,
+                DeviceModel = devicemodel,
+                DeviceName = devicename,
+                DeviceBrand = devicebrand,
                 APILevel = APIlevel
             };
 
@@ -196,7 +196,7 @@ namespace FixDiEm
                     if (currentLine.Length > 0 && setting.RemoveSOPath) // Clear SO Path
                     {
                         // /data/app/com.gameloft.android.ANMP.GloftA9HM-FrOY_R937xKDYVA2yPYfhQ==/lib/arm64/libAsphalt9.so (offset 0x309c000)
-                        if (currentLine.Contains("offset "))
+                        if (currentLine.Contains("offset ")) //remove offset
                         {
                             int start = currentLine.IndexOf('/');
                             int end = currentLine.IndexOf(')');
@@ -206,7 +206,7 @@ namespace FixDiEm
                                 finalCurrentLine = currentLine.Remove(start, len);
                             }
                         }
-                        else if (currentLine.Contains(" /data/") && currentLine.Contains(".so "))
+                        else if (currentLine.Contains(" /data/") && currentLine.Contains(".so ")) // Remove SO path
                         {
                             int start = currentLine.IndexOf('/');
                             int end = currentLine.IndexOf('(');
@@ -247,29 +247,24 @@ namespace FixDiEm
                 }
                 if (isNewIssue)
                 {
-                    int posLast = backtraceData[0].LastIndexOf('/');
-                    string issueName = posLast > 0 ? backtraceData[0].Substring(posLast + 1) : backtraceData[0];
-
-                    foreach(var line in backtraceData)
-                    {
-                        string[] lines_issuename = line.Split(' ');
-                        string lastArray = lines_issuename[lines_issuename.Length - 1];
-                        if (lastArray.StartsWith("(") && lastArray.EndsWith(")"))
-                        {
-                            issueName = lastArray;
-                            break;
-                        }
-                    }
                     CrashReport issuedata = new CrashReport
                     {
                         AddressHashCode = hashCode,
                         Stactrace = backtraceData,
                         ID = IssueList.Count(),
-                        FolderName = folderName,
-                        Name = issueName
+                        FolderName = folderName
                     };
                     issuedata.DeviceIndex.Add(index);
                     issuedata.SetStackTraceLines(backtraceData);
+
+                    foreach (var line in issuedata.Stacktracelines) // Get issue name
+                    {
+                        if (line.Function != "")
+                        {
+                            issuedata.Name = line.Function;
+                            break;
+                        }
+                    }
                     IssueList.Add(issuedata);
                     data.IssueID = issuedata.ID;
 
