@@ -23,8 +23,9 @@ namespace FixDiEm
             public bool IsParseDsym;
             public bool IsShowCrashAddress;
             public int NumLineToShow;
+            public string SoPathRegex;
         }
-
+        
         private AppSetting Settings;
 
         public void SaveToFile(string saveFileName)
@@ -34,10 +35,12 @@ namespace FixDiEm
         }
         public bool LoadSettings(string saveFileName)
         {
+            
             if (File.Exists(saveFileName))
             {
                 string json = File.ReadAllText(saveFileName);
                 Settings = JsonConvert.DeserializeObject<AppSetting>(json);
+                Settings.SoPathRegex = @"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"; //cheat
                 return true;
             }
             return false;
@@ -150,6 +153,17 @@ namespace FixDiEm
             get
             {
                 return Settings.NumLineToShow;
+            }
+        }
+        public string SoPathRegex
+        {
+            set
+            {
+                Settings.SoPathRegex = value;
+            }
+            get
+            {
+                return Settings.SoPathRegex;
             }
         }
     }

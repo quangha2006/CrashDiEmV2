@@ -17,12 +17,6 @@ namespace FixDiEm
 {
     class AnalyzeData
     {
-        public struct MySetting
-        {
-            public bool ParseDsym;
-            public bool RemoveSOPath;
-        }
-
         public CrashData[] CrashDataRaw { set; get; }
         public int ReportLoaded { private set; get; } = 0;
         public List<Device> DevicesList { set; get; }
@@ -56,7 +50,7 @@ namespace FixDiEm
         }
         public delegate void ReadFile(string qua);
 
-        public int LoadCrashLogs(BackgroundWorker backgroundWorker, MySetting setting)
+        public int LoadCrashLogs(BackgroundWorker backgroundWorker, AppSettings setting)
         {
 
             ClearAndReInitData();
@@ -96,7 +90,7 @@ namespace FixDiEm
             Console.WriteLine("Time to load: {0}, files: {1}", milliseconds_3 - milliseconds_1, ReportLoaded);
             return ReportLoaded;
         }
-        private void ConvertData(ref string[] lines, string path, MySetting setting, int index)
+        private void ConvertData(ref string[] lines, string path, AppSettings setting, int index)
         {
             var type        = lines[0];
             var appcode     = lines[2].Split(':')[1].Trim();
@@ -193,10 +187,10 @@ namespace FixDiEm
                 {
                     string currentLine = lines[i + backtraceBeginLineIndex + 1];
                     string finalCurrentLine = currentLine;
-                    if (currentLine.Length > 0 && setting.RemoveSOPath) // Clear SO Path
+                    if (currentLine.Length > 0 && setting.IsRemoveSOPath) // Clear SO Path
                     {
                         // /data/app/com.gameloft.android.ANMP.GloftA9HM-FrOY_R937xKDYVA2yPYfhQ==/lib/arm64/libAsphalt9.so (offset 0x309c000)
-                        if (currentLine.Contains("offset ")) //remove offset
+                        /*if (currentLine.Contains("offset ")) //remove offset
                         {
                             int start = currentLine.IndexOf('/');
                             int end = currentLine.IndexOf(')');
@@ -206,14 +200,14 @@ namespace FixDiEm
                                 finalCurrentLine = currentLine.Remove(start, len);
                             }
                         }
-                        else if (currentLine.Contains(" /data/") && currentLine.Contains(".so ")) // Remove SO path
+                        else if (currentLine.Contains(" /data/") && currentLine.Contains(".so ")) // Remove SO path*/
                         {
-                            int start = currentLine.IndexOf('/');
-                            int end = currentLine.IndexOf('(');
-                            int len = end - start;
-                            if (len > 0)
+                            Regex regex = new Regex(setting.SoPathRegex);
+                            Match result = regex.Match(currentLine);
+
+                            if (result != Match.Empty)
                             {
-                                finalCurrentLine = currentLine.Remove(start, len);
+                                finalCurrentLine = currentLine.Remove(result.Index, result.Length);
                             }
                         }
                     }

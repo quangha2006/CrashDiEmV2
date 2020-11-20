@@ -108,22 +108,22 @@ namespace FixDiEm
         }
         private void SaveSettings()
         {
+            appSettings.SaveToFile(SaveFileName);
+        }
+        private void AppSettings_Changed(object sender, EventArgs e)
+        {
+            IsSaveSettings = true;
+
             appSettings.ArmSoPath = textBox_arm.Text;
             appSettings.Arm64SoPath = textBox_armV8.Text;
             appSettings.X86SoPath = textBox_x86.Text;
-            appSettings.X86_64SoPath  = textBox_x86_64.Text;
+            appSettings.X86_64SoPath = textBox_x86_64.Text;
             appSettings.CrashLogPath = textBox_CrashLogs.Text;
             appSettings.IsParseDsym = checkBox_parseDsym.Checked;
             appSettings.IsGroupIssueByGoogle = checkBox_GroupIssueByGoogle.Checked;
             appSettings.IsRemoveSOPath = checkBox_RemoveSOPath.Checked;
             appSettings.IsShowCrashAddress = checkBox_showAddress.Checked;
             appSettings.NumLineToShow = (int)numericUpDown_MaxLineOfStackToShow.Value;
-
-            appSettings.SaveToFile(SaveFileName);
-        }
-        private void AppSettings_Changed(object sender, EventArgs e)
-        {
-            IsSaveSettings = true;
         }
         private void textBox_CrashLogs_TextChanged(object sender, EventArgs e)
         {
@@ -254,10 +254,8 @@ namespace FixDiEm
                 {
                     SetUpProgressBar(0, fCount, true, "Loading");
                 });
-                AnalyzeData.MySetting setting;
-                setting.ParseDsym = checkBox_parseDsym.Checked;
-                setting.RemoveSOPath = checkBox_RemoveSOPath.Checked;
-                int filesLoaded = analyzeData.LoadCrashLogs(backgroundWorker_AnalyzeData, setting);
+
+                int filesLoaded = analyzeData.LoadCrashLogs(backgroundWorker_AnalyzeData, appSettings);
 
                 analyzeData.ProcessData();
 
