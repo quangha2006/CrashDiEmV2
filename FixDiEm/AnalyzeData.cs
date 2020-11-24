@@ -73,12 +73,10 @@ namespace FixDiEm
             foreach (string file in List_files)
             {
                 string contents = File.ReadAllText(file);
-                string[] lines = contents.Split('\n');
-                if (lines[0] == "NATIVE CRASH" || lines[0] == "JAVA CRASH")
-                {
-                    ConvertData(ref lines, file.Remove(0, LogCrashPath.Length), setting, index);
+
+                if (ConvertData(ref contents, file.Remove(0, LogCrashPath.Length), setting, index))
                     backgroundWorker.ReportProgress(++index);
-                }
+
                 if (backgroundWorker.CancellationPending)
                 {
                     break;
@@ -90,22 +88,36 @@ namespace FixDiEm
             Console.WriteLine("Time to load: {0}, files: {1}", milliseconds_3 - milliseconds_1, ReportLoaded);
             return ReportLoaded;
         }
-        private void ConvertData(ref string[] lines, string path, AppSettings setting, int index)
+        private bool ConvertData(ref string fileContent, string path, AppSettings setting, int index)
         {
-            var type        = lines[0];
-            var appcode     = lines[2].Split(':')[1].Trim();
-            var Datetime    = lines[3].Substring(lines[3].IndexOf(':') + 2).Trim().Split(',');
-            var versioncode = lines[4].Split(':')[1].Trim();
-            var versionname = lines[5].Split(':')[1].Trim();
-            var devicemodel = lines[6].Split(':')[1].Trim();
-            var devicename  = lines[7].Split(':')[1].Trim();
-            var devicebrand = lines[8].Split(':')[1].Trim();
-            var apilevel    = lines[9].Split(':')[1].Trim();
-            var architec    = lines[10].Split(':')[1].Trim();
-            var folderName  = Path.GetFileName(Path.GetDirectoryName(path));
+            Regex reg = setting.ReportFileStructureRegex;
 
+            MatchCollection result = reg.Matches(fileContent);
+
+            if (result.Count == 0)
+            {
+                Console.WriteLine("Can't parse file: {0}", path);
+                return false;
+            }
+            string type = result[0].Groups["crashtype"].Value.Trim();
+            string appcode = result[0].Groups["appcode"].Value.Trim();
+            string[] Datetime = result[0].Groups["datetime"].Value.Trim().Split(',');
+            string versioncode = result[0].Groups["versioncode"].Value.Trim();
+            string versionname = result[0].Groups["versionname"].Value.Trim();
+            string devicemodel = result[0].Groups["devicemodel"].Value.Trim();
+            string devicename = result[0].Groups["devicename"].Value.Trim();
+            string devicebrand = result[0].Groups["devicebrand"].Value.Trim();
+            string apilevel = result[0].Groups["apilevel"].Value.Trim();
+            string architec = result[0].Groups["architecture"].Value.Trim();
+            string[] lines = result[0].Groups["stacktrace"].Value.Trim().Split('\n');
+            var folderName  = Path.GetFileName(Path.GetDirectoryName(path));
             var datetime    = new DateTime();
 
+            if (type != "NATIVE CRASH" && type != "JAVA CRASH")
+            {
+                Console.WriteLine("Not a report file: {0}", path);
+                return false;
+            }
             //Parse DateTime
             if (Datetime.Length > 0)
             {
@@ -173,7 +185,7 @@ namespace FixDiEm
             {
                 // Find where is backtrace?
                 int backtraceBeginLineIndex = 0;
-                foreach (string line in lines) // Can find begin line 10, opt late!
+                foreach (string line in lines)
                 {
                     if (line == "backtrace:" || line == "Stacktrace:") //Stacktrace is new version
                         break;
@@ -189,27 +201,15 @@ namespace FixDiEm
                     string finalCurrentLine = currentLine;
                     if (currentLine.Length > 0 && setting.IsRemoveSOPath) // Clear SO Path
                     {
-                        // /data/app/com.gameloft.android.ANMP.GloftA9HM-FrOY_R937xKDYVA2yPYfhQ==/lib/arm64/libAsphalt9.so (offset 0x309c000)
-                        /*if (currentLine.Contains("offset ")) //remove offset
-                        {
-                            int start = currentLine.IndexOf('/');
-                            int end = currentLine.IndexOf(')');
-                            int len = end - start + 2;
-                            if (end < (currentLine.Length - 1))
-                            {
-                                finalCurrentLine = currentLine.Remove(start, len);
-                            }
-                        }
-                        else if (currentLine.Contains(" /data/") && currentLine.Contains(".so ")) // Remove SO path*/
-                        {
-                            Regex regex = new Regex(setting.SoPathRegex);
-                            Match result = regex.Match(currentLine);
+                        
+                         Regex regex = setting.SoPathRegex;
+                         Match resultSoPathRegex = regex.Match(currentLine);
 
-                            if (result != Match.Empty)
-                            {
-                                finalCurrentLine = currentLine.Remove(result.Index, result.Length);
-                            }
-                        }
+                         if (resultSoPathRegex != Match.Empty)
+                         {
+                             finalCurrentLine = currentLine.Remove(resultSoPathRegex.Index, resultSoPathRegex.Length);
+                         }
+                        
                     }
                     backtraceData[i] = finalCurrentLine;
                 }
@@ -284,7 +284,15 @@ namespace FixDiEm
             } // end native crash
             else // Java Crash
             {
-                int backtraceBeginLine = 12;
+                int backtraceBeginLine = 0;
+
+                foreach (var line in lines)
+                {
+                    if (string.IsNullOrEmpty(line))
+                        backtraceBeginLine++;
+                    else
+                        break;
+                }
 
                 if (backtraceBeginLine >= lines.Count())
                 {
@@ -337,6 +345,7 @@ namespace FixDiEm
             }
             ReportLoaded++;
             CrashDataRaw[index] = data;
+            return true;
         }
         
         public void ProcessData()

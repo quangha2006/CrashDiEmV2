@@ -48,7 +48,7 @@ namespace FixDiEm
                 {
                     string therestofLine = line.Substring(line.IndexOf(Stacktracelines[i].CrashAddress)+ Stacktracelines[i].CrashAddress.Length).TrimStart();
 
-                    if (lineSplit[7].Contains(".so")) // Need implement with .apk
+                    if (lineSplit[7].Contains(".so"))
                     {
                         Stacktracelines[i].SOPath = lineSplit[7];
 

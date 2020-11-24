@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace FixDiEm
 {
@@ -23,7 +24,8 @@ namespace FixDiEm
             public bool IsParseDsym;
             public bool IsShowCrashAddress;
             public int NumLineToShow;
-            public string SoPathRegex;
+            public Regex SoPathRegex;
+            public Regex ReportFileStructureRegex;
         }
         
         private AppSetting Settings;
@@ -35,13 +37,18 @@ namespace FixDiEm
         }
         public bool LoadSettings(string saveFileName)
         {
-            
             if (File.Exists(saveFileName))
             {
                 string json = File.ReadAllText(saveFileName);
-                Settings = JsonConvert.DeserializeObject<AppSetting>(json);
-                Settings.SoPathRegex = @"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"; //cheat
-                return true;
+                try
+                {
+                    Settings = JsonConvert.DeserializeObject<AppSetting>(json);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception when read {0}: {1}", saveFileName, e.ToString());
+                }
             }
             return false;
         }
@@ -155,7 +162,7 @@ namespace FixDiEm
                 return Settings.NumLineToShow;
             }
         }
-        public string SoPathRegex
+        public Regex SoPathRegex
         {
             set
             {
@@ -164,6 +171,17 @@ namespace FixDiEm
             get
             {
                 return Settings.SoPathRegex;
+            }
+        }
+        public Regex ReportFileStructureRegex
+        {
+            set
+            {
+                Settings.ReportFileStructureRegex = value;
+            }
+            get
+            {
+                return Settings.ReportFileStructureRegex;
             }
         }
     }

@@ -50,6 +50,7 @@
             this.btn_Analyse = new System.Windows.Forms.Button();
             this.checkBox_autoShutdown = new System.Windows.Forms.CheckBox();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.btn_Settings = new System.Windows.Forms.Button();
             this.btn_Load = new System.Windows.Forms.Button();
             this.btn_Save = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
@@ -294,7 +295,7 @@
             // checkBox_autoShutdown
             // 
             this.checkBox_autoShutdown.AutoSize = true;
-            this.checkBox_autoShutdown.Location = new System.Drawing.Point(170, 26);
+            this.checkBox_autoShutdown.Location = new System.Drawing.Point(260, 26);
             this.checkBox_autoShutdown.Name = "checkBox_autoShutdown";
             this.checkBox_autoShutdown.Size = new System.Drawing.Size(99, 17);
             this.checkBox_autoShutdown.TabIndex = 4;
@@ -303,6 +304,7 @@
             // 
             // groupBox4
             // 
+            this.groupBox4.Controls.Add(this.btn_Settings);
             this.groupBox4.Controls.Add(this.btn_Load);
             this.groupBox4.Controls.Add(this.checkBox_autoShutdown);
             this.groupBox4.Controls.Add(this.btn_Save);
@@ -312,6 +314,16 @@
             this.groupBox4.TabIndex = 9;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Load and save";
+            // 
+            // btn_Settings
+            // 
+            this.btn_Settings.Location = new System.Drawing.Point(171, 20);
+            this.btn_Settings.Name = "btn_Settings";
+            this.btn_Settings.Size = new System.Drawing.Size(75, 23);
+            this.btn_Settings.TabIndex = 5;
+            this.btn_Settings.Text = "Settings";
+            this.btn_Settings.UseVisualStyleBackColor = true;
+            this.btn_Settings.Click += new System.EventHandler(this.btn_Settings_Click);
             // 
             // btn_Load
             // 
@@ -657,6 +669,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker_SaveData;
         private System.Windows.Forms.ColumnHeader column_Name;
         private System.ComponentModel.BackgroundWorker backgroundWorker_ShowCrashIssue;
+        private System.Windows.Forms.Button btn_Settings;
     }
 }
 

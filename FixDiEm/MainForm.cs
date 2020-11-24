@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -78,6 +79,22 @@ namespace FixDiEm
                 checkBox_RemoveSOPath.Checked = appSettings.IsRemoveSOPath;
                 checkBox_showAddress.Checked = appSettings.IsShowCrashAddress;
                 numericUpDown_MaxLineOfStackToShow.Value = appSettings.NumLineToShow;
+            }
+            else //default
+            {
+                appSettings.SoPathRegex = new Regex(@"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"); //cheat
+                appSettings.ReportFileStructureRegex = new Regex(
+                    @"(?<crashtype>(^(.*)(\r\r|\n\n|\r\n\r\n)))" +
+                    @"App Code:(?<appcode>.*)\n" +
+                    @"Date time:(?<datetime>.*)\n" +
+                    @"Version code:(?<versioncode>.*)\n" +
+                    @"Version name:(?<versionname>.*)\n" +
+                    @"Device model:(?<devicemodel>.*)\n" +
+                    @"Device name:(?<devicename>.*)\n" +
+                    @"Device brand:(?<devicebrand>.*)\n" +
+                    @"API level:(?<apilevel>.*)\n" +
+                    @"Architecture:(?<architecture>.*\n)" +
+                    @"(?<stacktrace>(.|\n)+)");
             }
             //Set callback TextChanged
             textBox_arm.TextChanged += AppSettings_Changed;
@@ -583,7 +600,7 @@ namespace FixDiEm
                         }
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                         {
-                            dataToShow += $"{collectData_Count - i - 1} more lines....\r\n";
+                            dataToShow += $"{collectData_Count - i} more lines....\r\n";
                             break;
                         }
                     }
@@ -718,6 +735,11 @@ namespace FixDiEm
                     SetUpProgressBar(analyzeData.ReportLoaded, analyzeData.ReportLoaded, true, "Loaded");
                 }
             }
+        }
+
+        private void btn_Settings_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
