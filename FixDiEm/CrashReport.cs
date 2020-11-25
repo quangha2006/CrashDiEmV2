@@ -18,6 +18,7 @@ namespace FixDiEm
     class CrashReport
     {
         public string           Name            { set; get; }
+        public CrashType        CrashType       { set; get; }
         public string           FolderName      { set; get; }
         public string[]         Stactrace       { set; get; }
         public StackTraceLine[] Stacktracelines { set; get; }

@@ -99,19 +99,19 @@ namespace FixDiEm
                 Console.WriteLine("Can't parse file: {0}", path);
                 return false;
             }
-            string type = result[0].Groups["crashtype"].Value.Trim();
-            string appcode = result[0].Groups["appcode"].Value.Trim();
-            string[] Datetime = result[0].Groups["datetime"].Value.Trim().Split(',');
-            string versioncode = result[0].Groups["versioncode"].Value.Trim();
-            string versionname = result[0].Groups["versionname"].Value.Trim();
-            string devicemodel = result[0].Groups["devicemodel"].Value.Trim();
-            string devicename = result[0].Groups["devicename"].Value.Trim();
-            string devicebrand = result[0].Groups["devicebrand"].Value.Trim();
-            string apilevel = result[0].Groups["apilevel"].Value.Trim();
-            string architec = result[0].Groups["architecture"].Value.Trim();
-            string[] lines = result[0].Groups["stacktrace"].Value.Trim().Split('\n');
-            var folderName  = Path.GetFileName(Path.GetDirectoryName(path));
-            var datetime    = new DateTime();
+            string      type         = result[0].Groups["crashtype"].Value.Trim();
+            string      appcode      = result[0].Groups["appcode"].Value.Trim();
+            string[]    Datetime     = result[0].Groups["datetime"].Value.Trim().Split(',');
+            string      versioncode  = result[0].Groups["versioncode"].Value.Trim();
+            string      versionname  = result[0].Groups["versionname"].Value.Trim();
+            string      devicemodel  = result[0].Groups["devicemodel"].Value.Trim();
+            string      devicename   = result[0].Groups["devicename"].Value.Trim();
+            string      devicebrand  = result[0].Groups["devicebrand"].Value.Trim();
+            string      apilevel     = result[0].Groups["apilevel"].Value.Trim();
+            string      architec     = result[0].Groups["architecture"].Value.Trim();
+            string[]    lines        = result[0].Groups["stacktrace"].Value.Trim().Split('\n');
+            var         folderName   = Path.GetFileName(Path.GetDirectoryName(path));
+            var         datetime     = new DateTime();
 
             if (type != "NATIVE CRASH" && type != "JAVA CRASH")
             {
@@ -150,7 +150,7 @@ namespace FixDiEm
 
             CrashData data = new CrashData(path)
             {
-                CrashType = type == "NATIVE CRASH" ? CrashType.Native_Crash : CrashType.JAVA_Crash,
+                CrashType = type == "NATIVE CRASH" ? CrashType.NATIVE : type == "JAVA CRASH" ? CrashType.JAVA : CrashType.NONE,
 
                 AppCode = appcode,
                 DateTime = datetime,
@@ -181,7 +181,7 @@ namespace FixDiEm
                     data.architecture = Architecture.Unknow;
                     break;
             }
-            if (data.CrashType == CrashType.Native_Crash)
+            if (data.CrashType == CrashType.NATIVE)
             {
                 // Find where is backtrace?
                 int backtraceBeginLineIndex = 0;
@@ -198,20 +198,20 @@ namespace FixDiEm
                 for (int i = 0; i < numlineBacktrace; i++)
                 {
                     string currentLine = lines[i + backtraceBeginLineIndex + 1];
-                    string finalCurrentLine = currentLine;
-                    if (currentLine.Length > 0 && setting.IsRemoveSOPath) // Clear SO Path
-                    {
+                    //string finalCurrentLine = currentLine;
+                    //if (currentLine.Length > 0 && setting.IsRemoveSOPath) // Clear SO Path
+                    //{
                         
-                         Regex regex = setting.SoPathRegex;
-                         Match resultSoPathRegex = regex.Match(currentLine);
+                    //     Regex regex = setting.SoPathRegex;
+                    //     Match resultSoPathRegex = regex.Match(currentLine);
 
-                         if (resultSoPathRegex != Match.Empty)
-                         {
-                             finalCurrentLine = currentLine.Remove(resultSoPathRegex.Index, resultSoPathRegex.Length);
-                         }
+                    //     if (resultSoPathRegex != Match.Empty)
+                    //     {
+                    //         finalCurrentLine = currentLine.Remove(resultSoPathRegex.Index, resultSoPathRegex.Length);
+                    //     }
                         
-                    }
-                    backtraceData[i] = finalCurrentLine;
+                    //}
+                    backtraceData[i] = currentLine;
                 }
                 //Check issue and add to list
                 //Get AddressString

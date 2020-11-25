@@ -17,8 +17,9 @@ namespace FixDiEm
     }
     public enum CrashType
     {
-        Native_Crash,
-        JAVA_Crash
+        NONE,
+        NATIVE,
+        JAVA
     }
 
     class CrashData

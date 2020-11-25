@@ -25,6 +25,7 @@ namespace FixDiEm
             public bool IsShowCrashAddress;
             public int NumLineToShow;
             public Regex SoPathRegex;
+            public Regex GameSoPathRegex;
             public Regex ReportFileStructureRegex;
         }
         
