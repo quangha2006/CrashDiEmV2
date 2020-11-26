@@ -20,19 +20,33 @@ namespace FixDiEm
         public string           Name            { set; get; }
         public CrashType        CrashType       { set; get; }
         public string           FolderName      { set; get; }
-        public string[]         Stactrace       { set; get; }
         public StackTraceLine[] Stacktracelines { set; get; }
         public int              AddressHashCode { set; get; }
         public int              ID              { set; get; }
         public List<int>        DeviceIndex     { set; get; }
+        private string[] Stactrace = null;
 
         public CrashReport()
         {
             DeviceIndex = new List<int>();
         }
+        public string[] GetStactrace()
+        {
+            if (Stactrace == null)
+            {
+                Stactrace = new string[Stacktracelines.Length];
 
+                for (int i =0; i < Stacktracelines.Length; i++)
+                {
+                    Stactrace[i] = $"{Stacktracelines[i].LineIndex} {Stacktracelines[i].SOPath} {Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
+                }
+            }
+            return Stactrace;
+        }
         public void SetStackTraceLines(string[] stacktracelines)
         {
+            Stactrace = stacktracelines;
+
             Stacktracelines = new StackTraceLine[stacktracelines.Count()];
             for(int i = 0; i < stacktracelines.Count(); i++)
             {

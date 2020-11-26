@@ -585,7 +585,7 @@ namespace FixDiEm
                     dataToShow += ($"Architecture: {string.Join(",", Arch.ToArray())}\r\n");
                     dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nStacktrace:\r\n\r\n");
 
-                    int collectData_Count = issue.Stactrace.Count();
+                    int collectData_Count = issue.GetStactrace().Length;
                     for (int i = 0; i < collectData_Count; i++)
                     {
                         string crashline = issue.Stactrace[i] + "\r\n";
