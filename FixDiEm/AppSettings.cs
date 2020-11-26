@@ -48,6 +48,7 @@ namespace FixDiEm
                 }
                 catch (Exception e)
                 {
+                    File.Delete(saveFileName);
                     Console.WriteLine("Exception when read {0}: {1}", saveFileName, e.ToString());
                 }
             }

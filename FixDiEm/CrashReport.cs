@@ -8,6 +8,7 @@ namespace FixDiEm
 {
     public struct StackTraceLine
     {
+        public string FullLine;
         public string LineIndex;
         public string CrashAddress;
         public string SOPath;
@@ -38,7 +39,8 @@ namespace FixDiEm
 
                 for (int i =0; i < Stacktracelines.Length; i++)
                 {
-                    Stactrace[i] = $"{Stacktracelines[i].LineIndex} {Stacktracelines[i].SOPath} {Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
+                    Stactrace[i] = Stacktracelines[i].FullLine;
+                    //Stactrace[i] = $"{Stacktracelines[i].LineIndex} {Stacktracelines[i].SOPath} {Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
                 }
             }
             return Stactrace;
@@ -53,6 +55,11 @@ namespace FixDiEm
                 string line = stacktracelines[i];
 
                 if (line.Length <= 0)
+                    continue;
+
+                Stacktracelines[i].FullLine = line;
+
+                if (CrashType == CrashType.JAVA)
                     continue;
 
                 string[] lineSplit = line.Split(' ');

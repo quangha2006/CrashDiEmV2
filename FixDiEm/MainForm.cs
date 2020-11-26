@@ -80,8 +80,9 @@ namespace FixDiEm
                 checkBox_showAddress.Checked = appSettings.IsShowCrashAddress;
                 numericUpDown_MaxLineOfStackToShow.Value = appSettings.NumLineToShow;
             }
-            else //default
+            if (appSettings.SoPathRegex == null || appSettings.ReportFileStructureRegex  == null)
             {
+                AppSettings_Changed(null,null);
                 appSettings.SoPathRegex = new Regex(@"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"); //cheat
                 appSettings.ReportFileStructureRegex = new Regex(
                     @"(?<crashtype>(^(.*)(\r\r|\n\n|\r\n\r\n)))" +
@@ -586,9 +587,10 @@ namespace FixDiEm
                     dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nStacktrace:\r\n\r\n");
 
                     int collectData_Count = issue.GetStactrace().Length;
+                    var stacktrace = issue.GetStactrace();
                     for (int i = 0; i < collectData_Count; i++)
                     {
-                        string crashline = issue.Stactrace[i] + "\r\n";
+                        string crashline = stacktrace[i] + "\r\n";
                         if (checkBox_showAddress.Checked)
                         {
                             dataToShow += crashline;

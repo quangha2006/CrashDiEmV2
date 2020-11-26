@@ -99,19 +99,19 @@ namespace FixDiEm
                 Console.WriteLine("Can't parse file: {0}", path);
                 return false;
             }
-            string      type         = result[0].Groups["crashtype"].Value.Trim();
-            string      appcode      = result[0].Groups["appcode"].Value.Trim();
-            string[]    Datetime     = result[0].Groups["datetime"].Value.Trim().Split(',');
-            string      versioncode  = result[0].Groups["versioncode"].Value.Trim();
-            string      versionname  = result[0].Groups["versionname"].Value.Trim();
-            string      devicemodel  = result[0].Groups["devicemodel"].Value.Trim();
-            string      devicename   = result[0].Groups["devicename"].Value.Trim();
-            string      devicebrand  = result[0].Groups["devicebrand"].Value.Trim();
-            string      apilevel     = result[0].Groups["apilevel"].Value.Trim();
-            string      architec     = result[0].Groups["architecture"].Value.Trim();
-            string[]    lines        = result[0].Groups["stacktrace"].Value.Trim().Split('\n');
-            var         folderName   = Path.GetFileName(Path.GetDirectoryName(path));
-            var         datetime     = new DateTime();
+            var type         = result[0].Groups["crashtype"].Value.Trim();
+            var appcode      = result[0].Groups["appcode"].Value.Trim();
+            var Datetime     = result[0].Groups["datetime"].Value.Trim().Split(',');
+            var versioncode  = result[0].Groups["versioncode"].Value.Trim();
+            var versionname  = result[0].Groups["versionname"].Value.Trim();
+            var devicemodel  = result[0].Groups["devicemodel"].Value.Trim();
+            var devicename   = result[0].Groups["devicename"].Value.Trim();
+            var devicebrand  = result[0].Groups["devicebrand"].Value.Trim();
+            var apilevel     = result[0].Groups["apilevel"].Value.Trim();
+            var architec     = result[0].Groups["architecture"].Value.Trim();
+            var lines        = result[0].Groups["stacktrace"].Value.Trim().Split('\n');
+            var folderName   = Path.GetFileName(Path.GetDirectoryName(path));
+            var datetime     = new DateTime();
 
             if (type != "NATIVE CRASH" && type != "JAVA CRASH")
             {
@@ -244,9 +244,9 @@ namespace FixDiEm
                     CrashReport issuedata = new CrashReport
                     {
                         AddressHashCode = hashCode,
-                        Stactrace = backtraceData,
                         ID = IssueList.Count(),
-                        FolderName = folderName
+                        FolderName = folderName,
+                        CrashType = CrashType.NATIVE
                     };
                     issuedata.DeviceIndex.Add(index);
                     issuedata.SetStackTraceLines(backtraceData);
@@ -332,12 +332,12 @@ namespace FixDiEm
                         {
                             Name = backtraceData[0],
                             AddressHashCode = hashCode,
-                            Stactrace = backtraceData,
                             ID = IssueList.Count(),
-                            FolderName = folderName
+                            FolderName = folderName,
+                            CrashType = CrashType.JAVA
                         };
                         issuedata.DeviceIndex.Add(index);
-
+                        issuedata.SetStackTraceLines(backtraceData);
                         IssueList.Add(issuedata);
                         data.IssueID = issuedata.ID;
                     }
@@ -388,7 +388,7 @@ namespace FixDiEm
             {
                 if (issue.ID == ID)
                 {
-                    return issue.Stactrace;
+                    return issue.GetStactrace();
                 }
             }
             return null;
