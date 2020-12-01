@@ -36,7 +36,6 @@ namespace FixDiEm
             }
         }
 
-
         private void ClearAndReInitData()
         {
             //Clear Old Data
@@ -379,7 +378,7 @@ namespace FixDiEm
             }
         }
 
-        public string[] GetBacktraceByID(int ID)
+        public string[] GetBacktraceByID(int ID, AppSettings settings)
         {
             if (ID == -1)
                 return null;
@@ -388,7 +387,7 @@ namespace FixDiEm
             {
                 if (issue.ID == ID)
                 {
-                    return issue.GetStactrace();
+                    return issue.GetStactrace(settings);
                 }
             }
             return null;

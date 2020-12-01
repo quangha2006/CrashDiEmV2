@@ -80,10 +80,11 @@ namespace FixDiEm
                 checkBox_showAddress.Checked = appSettings.IsShowCrashAddress;
                 numericUpDown_MaxLineOfStackToShow.Value = appSettings.NumLineToShow;
             }
-            if (appSettings.SoPathRegex == null || appSettings.ReportFileStructureRegex  == null)
+            if (appSettings.SoPathRegex == null || appSettings.ReportFileStructureRegex  == null || appSettings.GameSoPathRegex == null)
             {
                 AppSettings_Changed(null,null);
                 appSettings.SoPathRegex = new Regex(@"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"); //cheat
+                appSettings.GameSoPathRegex = new Regex(@"/data.+(?!.apk).+(\.so$)"); //cheat
                 appSettings.ReportFileStructureRegex = new Regex(
                     @"(?<crashtype>(^(.*)(\r\r|\n\n|\r\n\r\n)))" +
                     @"App Code:(?<appcode>.*)\n" +
@@ -402,7 +403,7 @@ namespace FixDiEm
 
                     dataToShow += "\r\n";
 
-                    string[] backTraces = analyzeData.GetBacktraceByID(data.IssueID);
+                    string[] backTraces = analyzeData.GetBacktraceByID(data.IssueID, appSettings);
                     if (backTraces != null)
                     {
 
@@ -586,20 +587,20 @@ namespace FixDiEm
                     dataToShow += ($"Architecture: {string.Join(",", Arch.ToArray())}\r\n");
                     dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nStacktrace:\r\n\r\n");
 
-                    int collectData_Count = issue.GetStactrace().Length;
-                    var stacktrace = issue.GetStactrace();
+                    var stacktrace = issue.GetStactrace(appSettings);
+                    int collectData_Count = stacktrace.Length;
                     for (int i = 0; i < collectData_Count; i++)
                     {
-                        string crashline = stacktrace[i] + "\r\n";
-                        if (checkBox_showAddress.Checked)
-                        {
-                            dataToShow += crashline;
-                        }
-                        else
-                        {
-                            dataToShow += RemoveAddressInCrashLine(crashline);
+                        dataToShow += stacktrace[i] + "\r\n";
+                        //if (checkBox_showAddress.Checked)
+                        //{
+                        //    dataToShow += crashline;
+                        //}
+                        //else
+                        //{
+                        //    dataToShow += RemoveAddressInCrashLine(crashline);
 
-                        }
+                        //}
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                         {
                             dataToShow += $"{collectData_Count - i} more lines....\r\n";

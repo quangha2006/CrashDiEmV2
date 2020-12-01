@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace FixDiEm
 {
@@ -26,22 +27,45 @@ namespace FixDiEm
         public int              ID              { set; get; }
         public List<int>        DeviceIndex     { set; get; }
         private string[] Stactrace = null;
+        private bool isShowAddress = true;
+        private bool isShowSOPath = true;
 
         public CrashReport()
         {
             DeviceIndex = new List<int>();
         }
-        public string[] GetStactrace()
+        public string[] GetStactrace(AppSettings settings)
         {
-            if (Stactrace == null)
+            if (Stactrace == null || isShowAddress != settings.IsShowCrashAddress || isShowSOPath != !settings.IsRemoveSOPath)
             {
+
                 Stactrace = new string[Stacktracelines.Length];
 
-                for (int i =0; i < Stacktracelines.Length; i++)
-                {
-                    Stactrace[i] = Stacktracelines[i].FullLine;
-                    //Stactrace[i] = $"{Stacktracelines[i].LineIndex} {Stacktracelines[i].SOPath} {Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
-                }
+                isShowAddress = settings.IsShowCrashAddress;
+                isShowSOPath = !settings.IsRemoveSOPath; // ><
+
+                if (isShowAddress && isShowSOPath || CrashType == CrashType.JAVA) // Get full stacktrace
+                    for (int i =0; i < Stacktracelines.Length; i++)
+                    {
+                        Stactrace[i] = Stacktracelines[i].FullLine;
+                    }
+                else
+                    for (int i = 0; i < Stacktracelines.Length; i++)
+                    {
+                        string address = isShowAddress ? Stacktracelines[i].CrashAddress: "";
+                        string sopath = Stacktracelines[i].SOPath;
+                        if (!isShowSOPath)
+                        {
+                            var sopathRegex = settings.GameSoPathRegex.ToString();
+
+                            if (Regex.IsMatch(sopath,sopathRegex))
+                            {
+                                sopath = "";
+                            }
+                        }
+                        string line = $"{Stacktracelines[i].LineIndex} {address} {sopath} {Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
+                        Stactrace[i] = line;
+                    }
             }
             return Stactrace;
         }

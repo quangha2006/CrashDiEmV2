@@ -175,6 +175,17 @@ namespace FixDiEm
                 return Settings.SoPathRegex;
             }
         }
+        public Regex GameSoPathRegex
+        {
+            set
+            {
+                Settings.GameSoPathRegex = value;
+            }
+            get
+            {
+                return Settings.GameSoPathRegex;
+            }
+        }
         public Regex ReportFileStructureRegex
         {
             set
