@@ -80,7 +80,7 @@ namespace FixDiEm
                 checkBox_showAddress.Checked = appSettings.IsShowCrashAddress;
                 numericUpDown_MaxLineOfStackToShow.Value = appSettings.NumLineToShow;
             }
-            if (appSettings.SoPathRegex == null || appSettings.ReportFileStructureRegex  == null)
+            if (appSettings.SoPathRegex == null || appSettings.ReportFileStructureRegex  == null || appSettings.GameSoPathRegex == null)
             {
                 AppSettings_Changed(null,null);
                 appSettings.SoPathRegex = new Regex(@"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"); //cheat
