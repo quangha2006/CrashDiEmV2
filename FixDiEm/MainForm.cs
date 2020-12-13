@@ -84,6 +84,7 @@ namespace FixDiEm
             {
                 AppSettings_Changed(null,null);
                 appSettings.SoPathRegex = new Regex(@"/data.+(\.so\s|\.apk\s|\.so$|\.apk$)"); //cheat
+                appSettings.GameSoPathRegex = new Regex(@"/data.+(\.so\s|\.so$)");
                 appSettings.ReportFileStructureRegex = new Regex(
                     @"(?<crashtype>(^(.*)(\r\r|\n\n|\r\n\r\n)))" +
                     @"App Code:(?<appcode>.*)\n" +
