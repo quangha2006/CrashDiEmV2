@@ -403,7 +403,7 @@ namespace FixDiEm
 
                     dataToShow += "\r\n";
 
-                    string[] backTraces = analyzeData.GetBacktraceByID(data.IssueID, appSettings);
+                    string[] backTraces = analyzeData.GetBacktraceByID(data.IssueID);
                     if (backTraces != null)
                     {
 
@@ -587,20 +587,20 @@ namespace FixDiEm
                     dataToShow += ($"Architecture: {string.Join(",", Arch.ToArray())}\r\n");
                     dataToShow += ("*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***\r\nStacktrace:\r\n\r\n");
 
-                    var stacktrace = issue.GetStactrace(appSettings);
-                    int collectData_Count = stacktrace.Length;
+                    int collectData_Count = issue.GetStactrace().Length;
+                    var stacktrace = issue.GetStactrace();
                     for (int i = 0; i < collectData_Count; i++)
                     {
-                        dataToShow += stacktrace[i] + "\r\n";
-                        //if (checkBox_showAddress.Checked)
-                        //{
-                        //    dataToShow += crashline;
-                        //}
-                        //else
-                        //{
-                        //    dataToShow += RemoveAddressInCrashLine(crashline);
+                        string crashline = stacktrace[i] + "\r\n";
+                        if (checkBox_showAddress.Checked)
+                        {
+                            dataToShow += crashline;
+                        }
+                        else
+                        {
+                            dataToShow += RemoveAddressInCrashLine(crashline);
 
-                        //}
+                        }
                         if (numericUpDown_MaxLineOfStackToShow.Value > 0 && i > numericUpDown_MaxLineOfStackToShow.Value)
                         {
                             dataToShow += $"{collectData_Count - i} more lines....\r\n";
