@@ -54,16 +54,18 @@ namespace FixDiEm
                     {
                         string address = isShowAddress ? Stacktracelines[i].CrashAddress: "";
                         string sopath = Stacktracelines[i].SOPath;
+                        string space = " ";
                         if (!isShowSOPath)
                         {
                             var sopathRegex = settings.GameSoPathRegex.ToString();
 
-                            if (Regex.IsMatch(sopath,sopathRegex))
+                            if (Regex.IsMatch(sopath, sopathRegex))
                             {
                                 sopath = "";
+                                space = "";// Need opt here
                             }
                         }
-                        string line = $"{Stacktracelines[i].LineIndex} {address} {sopath} {Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
+                        string line = $"{Stacktracelines[i].LineIndex} {address} {sopath}{space}{Stacktracelines[i].Function} {Stacktracelines[i].SourceFile}";
                         Stactrace[i] = line;
                     }
             }
@@ -93,7 +95,7 @@ namespace FixDiEm
                 if (lineSplit.Length > 7)
                 {
                     string therestofLine = line.Substring(line.IndexOf(Stacktracelines[i].CrashAddress)+ Stacktracelines[i].CrashAddress.Length).TrimStart();
-
+                    // Need re-check here, Cause we still have .oat
                     if (lineSplit[7].Contains(".so"))
                     {
                         Stacktracelines[i].SOPath = lineSplit[7];
