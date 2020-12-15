@@ -96,7 +96,7 @@ namespace FixDiEm
                 {
                     string therestofLine = line.Substring(line.IndexOf(Stacktracelines[i].CrashAddress)+ Stacktracelines[i].CrashAddress.Length).TrimStart();
                     // Need re-check here, Cause we still have .oat
-                    if (lineSplit[7].Contains(".so"))
+                    /*if (lineSplit[7].Contains(".so"))
                     {
                         Stacktracelines[i].SOPath = lineSplit[7];
 
@@ -107,6 +107,14 @@ namespace FixDiEm
                         Stacktracelines[i].SOPath = lineSplit[7];
 
                         therestofLine = therestofLine.Substring(therestofLine.IndexOf(".apk") + 4).Trim();
+                    }*/
+                    if (lineSplit[7][0] == '/')
+                    {
+                        Stacktracelines[i].SOPath = lineSplit[7];
+
+                        int indexSpace = therestofLine.IndexOf(' ');
+                        if (indexSpace != -1)
+                            therestofLine = therestofLine.Substring(indexSpace + 1).Trim();
                     }
 
                     string offset = therestofLine.IndexOf("(offset") == 0 ? therestofLine.Substring(0, therestofLine.IndexOf(')') + 1) : "";
