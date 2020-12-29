@@ -12,11 +12,15 @@ namespace FixDiEm
 {
     public partial class SettingForm : Form
     {
+        private AppSettings currentSetting;
         public SettingForm()
         {
             InitializeComponent();
         }
+        public void SetSetting(AppSettings setting)
+        {
 
+        }
         private void button1_Click(object sender, EventArgs e)
         {
 
