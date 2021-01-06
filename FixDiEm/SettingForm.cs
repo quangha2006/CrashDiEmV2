@@ -19,9 +19,18 @@ namespace FixDiEm
         }
         public void SetSetting(AppSettings setting)
         {
-
+            currentSetting = setting;
+            //Apply Data
+            textBox_SoPath.Text = currentSetting.SoPathRegex.ToString();
+            textBox_GameSoPath.Text = currentSetting.GameSoPathRegex.ToString();
+            textBox_ReportFileStructure.Text = currentSetting.ReportFileStructureRegex.ToString();
         }
         private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void label1_Click(object sender, EventArgs e)
         {
 
         }

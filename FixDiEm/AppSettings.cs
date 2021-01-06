@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace FixDiEm
 {
-    class AppSettings
+    public class AppSettings
     {
         //Why I need to create this struct? Because I have no way to make a json without it.
         private struct AppSetting

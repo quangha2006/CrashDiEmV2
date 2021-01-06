@@ -743,6 +743,7 @@ namespace FixDiEm
         private void btn_Settings_Click(object sender, EventArgs e)
         {
             SettingForm settingForm = new SettingForm();
+            settingForm.SetSetting(appSettings);
             settingForm.ShowDialog();
         }
     }

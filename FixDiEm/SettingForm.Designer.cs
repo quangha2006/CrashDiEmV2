@@ -28,68 +28,77 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.label_SoPath = new System.Windows.Forms.Label();
+            this.textBox_SoPath = new System.Windows.Forms.TextBox();
+            this.label_GameSoPath = new System.Windows.Forms.Label();
+            this.textBox_GameSoPath = new System.Windows.Forms.TextBox();
+            this.label_ReportFileStructure = new System.Windows.Forms.Label();
+            this.textBox_ReportFileStructure = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // label1
+            // label_SoPath
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 13);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
+            this.label_SoPath.AutoSize = true;
+            this.label_SoPath.Location = new System.Drawing.Point(6, 13);
+            this.label_SoPath.Name = "label_SoPath";
+            this.label_SoPath.Size = new System.Drawing.Size(45, 13);
+            this.label_SoPath.TabIndex = 0;
+            this.label_SoPath.Text = "SoPath:";
+            this.label_SoPath.Click += new System.EventHandler(this.label1_Click);
             // 
-            // textBox1
+            // textBox_SoPath
             // 
-            this.textBox1.Location = new System.Drawing.Point(55, 5);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(413, 20);
-            this.textBox1.TabIndex = 1;
+            this.textBox_SoPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_SoPath.Location = new System.Drawing.Point(9, 32);
+            this.textBox_SoPath.Name = "textBox_SoPath";
+            this.textBox_SoPath.Size = new System.Drawing.Size(471, 20);
+            this.textBox_SoPath.TabIndex = 1;
             // 
-            // label2
+            // label_GameSoPath
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 37);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(35, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "label2";
+            this.label_GameSoPath.AutoSize = true;
+            this.label_GameSoPath.Location = new System.Drawing.Point(7, 70);
+            this.label_GameSoPath.Name = "label_GameSoPath";
+            this.label_GameSoPath.Size = new System.Drawing.Size(73, 13);
+            this.label_GameSoPath.TabIndex = 2;
+            this.label_GameSoPath.Text = "GameSoPath:";
             // 
-            // textBox2
+            // textBox_GameSoPath
             // 
-            this.textBox2.Location = new System.Drawing.Point(55, 37);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(413, 20);
-            this.textBox2.TabIndex = 3;
+            this.textBox_GameSoPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_GameSoPath.Location = new System.Drawing.Point(9, 92);
+            this.textBox_GameSoPath.Name = "textBox_GameSoPath";
+            this.textBox_GameSoPath.Size = new System.Drawing.Size(471, 20);
+            this.textBox_GameSoPath.TabIndex = 3;
             // 
-            // label3
+            // label_ReportFileStructure
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 71);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(35, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "label3";
+            this.label_ReportFileStructure.AutoSize = true;
+            this.label_ReportFileStructure.Location = new System.Drawing.Point(6, 124);
+            this.label_ReportFileStructure.Name = "label_ReportFileStructure";
+            this.label_ReportFileStructure.Size = new System.Drawing.Size(101, 13);
+            this.label_ReportFileStructure.TabIndex = 4;
+            this.label_ReportFileStructure.Text = "ReportFileStructure:";
             // 
-            // textBox3
+            // textBox_ReportFileStructure
             // 
-            this.textBox3.Location = new System.Drawing.Point(55, 71);
-            this.textBox3.Multiline = true;
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(413, 228);
-            this.textBox3.TabIndex = 5;
+            this.textBox_ReportFileStructure.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_ReportFileStructure.Location = new System.Drawing.Point(9, 145);
+            this.textBox_ReportFileStructure.Multiline = true;
+            this.textBox_ReportFileStructure.Name = "textBox_ReportFileStructure";
+            this.textBox_ReportFileStructure.Size = new System.Drawing.Size(471, 203);
+            this.textBox_ReportFileStructure.TabIndex = 5;
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(312, 318);
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(319, 361);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 6;
@@ -99,7 +108,8 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(393, 318);
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(405, 360);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 7;
@@ -110,15 +120,15 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(492, 353);
+            this.ClientSize = new System.Drawing.Size(492, 395);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.textBox_ReportFileStructure);
+            this.Controls.Add(this.label_ReportFileStructure);
+            this.Controls.Add(this.textBox_GameSoPath);
+            this.Controls.Add(this.label_GameSoPath);
+            this.Controls.Add(this.textBox_SoPath);
+            this.Controls.Add(this.label_SoPath);
             this.Name = "SettingForm";
             this.Text = "Settings";
             this.ResumeLayout(false);
@@ -128,12 +138,12 @@
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.Label label_SoPath;
+        private System.Windows.Forms.TextBox textBox_SoPath;
+        private System.Windows.Forms.Label label_GameSoPath;
+        private System.Windows.Forms.TextBox textBox_GameSoPath;
+        private System.Windows.Forms.Label label_ReportFileStructure;
+        private System.Windows.Forms.TextBox textBox_ReportFileStructure;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
     }
