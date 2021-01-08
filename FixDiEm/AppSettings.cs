@@ -19,7 +19,7 @@ namespace FixDiEm
             public string X86SoPath;
             public string X86_64SoPath;
             public string CrashLogsPath;
-            public bool IsRemoveSOPath;
+            public bool IsShowSOPath;
             public bool IsGroupIssueByGoogle;
             public bool IsParseDsym;
             public bool IsShowCrashAddress;
@@ -109,15 +109,15 @@ namespace FixDiEm
                 return Settings.CrashLogsPath;
             }
         }
-        public bool IsRemoveSOPath
+        public bool IsShowSOPath
         {
             set
             {
-                Settings.IsRemoveSOPath = value;
+                Settings.IsShowSOPath = value;
             }
             get
             {
-                return Settings.IsRemoveSOPath;
+                return Settings.IsShowSOPath;
             }
         }
         public bool IsGroupIssueByGoogle

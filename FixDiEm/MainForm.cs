@@ -76,7 +76,7 @@ namespace FixDiEm
                 textBox_CrashLogs.Text = appSettings.CrashLogPath;
                 checkBox_parseDsym.Checked = appSettings.IsParseDsym;
                 checkBox_GroupIssueByGoogle.Checked = appSettings.IsGroupIssueByGoogle;
-                checkBox_RemoveSOPath.Checked = appSettings.IsRemoveSOPath;
+                checkBox_ShowSOPath.Checked = appSettings.IsShowSOPath;
                 checkBox_showAddress.Checked = appSettings.IsShowCrashAddress;
                 numericUpDown_MaxLineOfStackToShow.Value = appSettings.NumLineToShow;
             }
@@ -106,7 +106,7 @@ namespace FixDiEm
             textBox_CrashLogs.TextChanged += AppSettings_Changed;
             checkBox_parseDsym.CheckStateChanged += AppSettings_Changed;
             checkBox_GroupIssueByGoogle.CheckStateChanged += AppSettings_Changed;
-            checkBox_RemoveSOPath.CheckStateChanged += AppSettings_Changed;
+            checkBox_ShowSOPath.CheckStateChanged += AppSettings_Changed;
             checkBox_showAddress.CheckStateChanged += AppSettings_Changed;
             checkBox_showAddress.CheckStateChanged += AppSettings_Changed;
             numericUpDown_MaxLineOfStackToShow.ValueChanged += AppSettings_Changed;
@@ -140,7 +140,7 @@ namespace FixDiEm
             appSettings.CrashLogPath = textBox_CrashLogs.Text;
             appSettings.IsParseDsym = checkBox_parseDsym.Checked;
             appSettings.IsGroupIssueByGoogle = checkBox_GroupIssueByGoogle.Checked;
-            appSettings.IsRemoveSOPath = checkBox_RemoveSOPath.Checked;
+            appSettings.IsShowSOPath = checkBox_ShowSOPath.Checked;
             appSettings.IsShowCrashAddress = checkBox_showAddress.Checked;
             appSettings.NumLineToShow = (int)numericUpDown_MaxLineOfStackToShow.Value;
         }

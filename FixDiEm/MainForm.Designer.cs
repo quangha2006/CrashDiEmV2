@@ -45,7 +45,7 @@
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.progressBar1 = new FixDiEm.TextProgressBar();
             this.checkBox_GroupIssueByGoogle = new System.Windows.Forms.CheckBox();
-            this.checkBox_RemoveSOPath = new System.Windows.Forms.CheckBox();
+            this.checkBox_ShowSOPath = new System.Windows.Forms.CheckBox();
             this.checkBox_parseDsym = new System.Windows.Forms.CheckBox();
             this.btn_Analyse = new System.Windows.Forms.Button();
             this.checkBox_autoShutdown = new System.Windows.Forms.CheckBox();
@@ -224,7 +224,7 @@
             // 
             this.groupBox3.Controls.Add(this.progressBar1);
             this.groupBox3.Controls.Add(this.checkBox_GroupIssueByGoogle);
-            this.groupBox3.Controls.Add(this.checkBox_RemoveSOPath);
+            this.groupBox3.Controls.Add(this.checkBox_ShowSOPath);
             this.groupBox3.Controls.Add(this.checkBox_parseDsym);
             this.groupBox3.Controls.Add(this.btn_Analyse);
             this.groupBox3.Location = new System.Drawing.Point(12, 104);
@@ -259,17 +259,15 @@
             this.checkBox_GroupIssueByGoogle.Text = "Group Issue by google";
             this.checkBox_GroupIssueByGoogle.UseVisualStyleBackColor = true;
             // 
-            // checkBox_RemoveSOPath
+            // checkBox_ShowSOPath
             // 
-            this.checkBox_RemoveSOPath.AutoSize = true;
-            this.checkBox_RemoveSOPath.Checked = true;
-            this.checkBox_RemoveSOPath.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBox_RemoveSOPath.Location = new System.Drawing.Point(176, 25);
-            this.checkBox_RemoveSOPath.Name = "checkBox_RemoveSOPath";
-            this.checkBox_RemoveSOPath.Size = new System.Drawing.Size(109, 17);
-            this.checkBox_RemoveSOPath.TabIndex = 2;
-            this.checkBox_RemoveSOPath.Text = "Remove SO Path";
-            this.checkBox_RemoveSOPath.UseVisualStyleBackColor = true;
+            this.checkBox_ShowSOPath.AutoSize = true;
+            this.checkBox_ShowSOPath.Location = new System.Drawing.Point(176, 25);
+            this.checkBox_ShowSOPath.Name = "checkBox_ShowSOPath";
+            this.checkBox_ShowSOPath.Size = new System.Drawing.Size(96, 17);
+            this.checkBox_ShowSOPath.TabIndex = 2;
+            this.checkBox_ShowSOPath.Text = "Show SO Path";
+            this.checkBox_ShowSOPath.UseVisualStyleBackColor = true;
             // 
             // checkBox_parseDsym
             // 
@@ -634,7 +632,7 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox checkBox_autoShutdown;
         private System.Windows.Forms.CheckBox checkBox_GroupIssueByGoogle;
-        private System.Windows.Forms.CheckBox checkBox_RemoveSOPath;
+        private System.Windows.Forms.CheckBox checkBox_ShowSOPath;
         private System.Windows.Forms.CheckBox checkBox_parseDsym;
         private System.Windows.Forms.Button btn_Analyse;
         private System.Windows.Forms.GroupBox groupBox4;

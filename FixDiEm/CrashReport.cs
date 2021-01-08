@@ -36,13 +36,13 @@ namespace FixDiEm
         }
         public string[] GetStactrace(AppSettings settings)
         {
-            if (Stactrace == null || isShowAddress != settings.IsShowCrashAddress || isShowSOPath != !settings.IsRemoveSOPath)
+            if (Stactrace == null || isShowAddress != settings.IsShowCrashAddress || isShowSOPath != !settings.IsShowSOPath)
             {
 
                 Stactrace = new string[Stacktracelines.Length];
 
                 isShowAddress = settings.IsShowCrashAddress;
-                isShowSOPath = !settings.IsRemoveSOPath; // ><
+                isShowSOPath = settings.IsShowSOPath; // ><
 
                 if (isShowAddress && isShowSOPath || CrashType == CrashType.JAVA) // Get full stacktrace
                     for (int i =0; i < Stacktracelines.Length; i++)
