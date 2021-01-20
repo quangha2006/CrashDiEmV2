@@ -19,9 +19,11 @@ namespace FixDiEm
         private string AppTitle = "FixDiEm | quang.haduy@gameloft.com";
         private string TextConfirmClosing = "Do you really want to exit?";
         private string SaveFileName = "appSetting.json";
+        private string devicespecsFileName = "Devices-Specs-Sep-2020-v003.csv";
         private bool IsSaveSettings = false;
         private AnalyzeData analyzeData = new AnalyzeData();
         private AppSettings appSettings = new AppSettings();
+        private DeviceSpecs deviceSpecs = new DeviceSpecs();
         private string dataToShow;
         private ListViewColumnSorter lvDevicesColumnSorter;
         private ListViewColumnSorter lvIssueColumnSorter;
@@ -454,6 +456,10 @@ namespace FixDiEm
         }
         private void ShowData_Device()
         {
+            //Need to load device specs first
+            deviceSpecs.LoadFormFile(devicespecsFileName);
+            
+            //Prepare listView
             listView_Devices.Items.Clear();
 
             foreach (var device in analyzeData.DevicesList)

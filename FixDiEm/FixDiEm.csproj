@@ -81,6 +81,7 @@
     <Compile Include="CrashData.cs" />
     <Compile Include="CrashReport.cs" />
     <Compile Include="Device.cs" />
+    <Compile Include="DeviceSpecs.cs" />
     <Compile Include="ListViewColumnSorter.cs" />
     <Compile Include="SettingForm.cs">
       <SubType>Form</SubType>
