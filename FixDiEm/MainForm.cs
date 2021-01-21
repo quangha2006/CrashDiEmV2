@@ -145,6 +145,9 @@ namespace FixDiEm
             appSettings.IsShowSOPath = checkBox_ShowSOPath.Checked;
             appSettings.IsShowCrashAddress = checkBox_showAddress.Checked;
             appSettings.NumLineToShow = (int)numericUpDown_MaxLineOfStackToShow.Value;
+#if DEBUG
+            SaveSettings();
+#endif
         }
         private void textBox_CrashLogs_TextChanged(object sender, EventArgs e)
         {

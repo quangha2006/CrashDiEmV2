@@ -55,7 +55,11 @@ namespace FixDiEm
                 while ((line = file.ReadLine()) != null)
                 {
                     string[] lines = line.Split(',');
-
+                    if (lines.Length != 11)
+                    {
+                        Console.WriteLine("ERROR!: {0}", line);
+                        continue;
+                    }
                     string manufac      = lines[0];
                     string modelname    = lines[1];
                     string devicename   = lines[2];
