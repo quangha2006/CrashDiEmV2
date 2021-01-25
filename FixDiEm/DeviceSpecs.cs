@@ -22,22 +22,22 @@ namespace FixDiEm
         }
         private struct Manufacturer
         {
-            string Name;
-            List<ModelName> ModelNames;
-            public void Add()
+            public string Name;
+            public List<ModelName> ModelNames;
+            public void Add(ModelName model)
             {
 
             }
         }
         private struct ModelName
         {
-            string Name;
-            List<DeviceName> DeviceNames;
+            public string Name;
+            public List<DeviceName> DeviceNames;
         }
         private struct DeviceName
         {
-            string Name;
-            DeviceSpec Spec;
+            public string Name;
+            public DeviceSpec Spec;
         }
         private List<Manufacturer> Manufacturers = new List<Manufacturer>();
 
@@ -45,7 +45,6 @@ namespace FixDiEm
         {
             if (File.Exists(filePath))
             {
-
                 StreamReader file = new StreamReader(filePath);
                 //Read first line to check format
                 string line = file.ReadLine();
@@ -72,7 +71,7 @@ namespace FixDiEm
                     string glesversion  = lines[9];
                     string sdk          = lines[10];
 
-                    DeviceSpec devicespec = new DeviceSpec
+                    DeviceSpec deviceSpec = new DeviceSpec
                     {
                         ModelCode       = modelcode,
                         GPU             = gpu,
@@ -83,7 +82,24 @@ namespace FixDiEm
                         OpenGLESVer     = glesversion,
                         SDKs            = sdk
                     };
-                    
+
+                    DeviceName deviceName = new DeviceName
+                    {
+                        Name = devicename,
+                        Spec = deviceSpec
+                    };
+
+                    ModelName modelName = new ModelName
+                    {
+                        Name = modelname,
+                        DeviceNames = new List<DeviceName> { deviceName }
+                    };
+                    // find manufac
+
+                    Manufacturer Manufac = Manufacturers.FirstOrDefault(x => x.Name == manufac);
+                    if (Manufac != null)
+                        Manufac.Add(modelName);
+
                 }
             }
             return false;
