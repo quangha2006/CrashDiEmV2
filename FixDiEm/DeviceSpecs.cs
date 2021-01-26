@@ -11,7 +11,6 @@ namespace FixDiEm
     {
         public struct DeviceSpec
         {
-            public string ModelCode;
             public string GPU;
             public string FormFactor;
             public string SystemOnChip;
@@ -23,18 +22,61 @@ namespace FixDiEm
         private struct Manufacturer
         {
             public string Name;
-            public List<ModelName> ModelNames;
-            public void Add(ModelName model)
+            public List<ModelName> ModelNames; // how about map?
+            public bool Add(ModelName model)
             {
-
+                if (ModelNames.Any(x => x.Name == model.Name))
+                {
+                    ModelName currModelName = ModelNames.First(x => x.Name == model.Name);
+                    return currModelName.Add(model.GetFirstDevice());
+                }
+                else
+                    ModelNames.Add(model);
+                return true;
             }
         }
         private struct ModelName
         {
             public string Name;
             public List<DeviceName> DeviceNames;
+            public bool Add(DeviceName device)
+            {
+                if (DeviceNames.Any(x => x.Name == device.Name))
+                {
+                    DeviceName currDevice = DeviceNames.First(x => x.Name == device.Name);
+                    return currDevice.Add(device.GetFirstDevice());
+                }
+                else
+                    DeviceNames.Add(device);
+                return true;
+            }
+            public DeviceName GetFirstDevice()
+            {
+                return DeviceNames.ElementAt(0);
+            }
         }
         private struct DeviceName
+        {
+            public string Name;
+            public List<ModelCode> ModelCodes;
+            public bool Add(ModelCode modelcode)
+            {
+                if (ModelCodes.Any(x => x.Name == modelcode.Name))
+                {
+                    //ModelCode modelCode = ModelCodes.First(x => x.Name == modelcode.Name);
+                    return false;
+                    //Console.WriteLine("Warning!: Duplicate model code {0}", modelcode.Name);
+                }
+                else
+                    ModelCodes.Add(modelcode);
+                return true;
+            }
+            public ModelCode GetFirstDevice()
+            {
+                return ModelCodes.ElementAt(0);
+            }
+        }
+        private struct ModelCode
         {
             public string Name;
             public DeviceSpec Spec;
@@ -73,7 +115,6 @@ namespace FixDiEm
 
                     DeviceSpec deviceSpec = new DeviceSpec
                     {
-                        ModelCode       = modelcode,
                         GPU             = gpu,
                         FormFactor      = formfactor, 
                         SystemOnChip    = sysonchip,
@@ -83,10 +124,16 @@ namespace FixDiEm
                         SDKs            = sdk
                     };
 
+                    ModelCode modelCode = new ModelCode
+                    {
+                        Name = modelcode,
+                        Spec = deviceSpec
+                    };
+
                     DeviceName deviceName = new DeviceName
                     {
                         Name = devicename,
-                        Spec = deviceSpec
+                        ModelCodes = new List<ModelCode> { modelCode }
                     };
 
                     ModelName modelName = new ModelName
@@ -95,10 +142,24 @@ namespace FixDiEm
                         DeviceNames = new List<DeviceName> { deviceName }
                     };
                     // find manufac
-
-                    Manufacturer Manufac = Manufacturers.FirstOrDefault(x => x.Name == manufac);
-                    if (Manufac != null)
-                        Manufac.Add(modelName);
+                    if (Manufacturers.Any(x => x.Name == manufac))
+                    {
+                        Manufacturer Manufac = Manufacturers.First(x => x.Name == manufac);
+                        if (!Manufac.Add(modelName))
+                        {
+                            Console.WriteLine("Warning!: Duplicate device {0}", line);
+                            Console.WriteLine("Warning!: at Manufacturers[{0}]", line, Manufacturers.IndexOf(Manufac));
+                        }
+                    }
+                    else
+                    {
+                        Manufacturer newManufac = new Manufacturer
+                        {
+                            Name = manufac,
+                            ModelNames = new List<ModelName> { modelName }
+                        };
+                        Manufacturers.Add(newManufac);
+                    }    
 
                 }
             }
